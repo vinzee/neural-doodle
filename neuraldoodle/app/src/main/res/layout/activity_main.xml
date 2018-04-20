@@ -50,6 +50,16 @@
             android:layout_height="fill_parent"
             android:contentDescription="@string/save"
             android:src="@drawable/save" />
+
+        <ImageButton
+            android:id="@+id/magic_btn"
+            android:layout_width="50dp"
+            android:layout_height="fill_parent"
+            android:contentDescription="@string/magic"
+            android:src="@drawable/magic"
+            android:scaleType="fitCenter" />
+
+        />
     </LinearLayout>
 
     <!-- Custom View -->

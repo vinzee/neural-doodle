@@ -1,12 +1,17 @@
 package com.example.vinzee.neural_doodle;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -15,6 +20,14 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.NetworkResponse;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
 import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
@@ -22,14 +35,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     //custom drawing view
     private DrawingView drawView;
     //buttons
-    private ImageButton currPaint, drawBtn, eraseBtn, newBtn, saveBtn, opacityBtn;
+    private ImageButton currPaint, drawBtn, eraseBtn, newBtn, saveBtn, opacityBtn, magicBtn;
     //sizes
     private float smallBrush, mediumBrush, largeBrush;
+    private RequestQueue queue;
+    private final String BASE_URL = "http://130.85.94.233:5000";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        queue = Volley.newRequestQueue(this);
 
         //get drawing view
         drawView = findViewById(R.id.drawing);
@@ -66,6 +83,37 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //opacity
         opacityBtn = findViewById(R.id.opacity_btn);
         opacityBtn.setOnClickListener(this);
+
+        //opacity
+        magicBtn = findViewById(R.id.magic_btn);
+        magicBtn.setOnClickListener(this);
+
+
+        // Here, thisActivity is the current activity
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.INTERNET)
+                != PackageManager.PERMISSION_GRANTED) {
+            Log.d("Permission", "already Not granted");
+            // Permission is not granted
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.INTERNET)) {
+
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+
+            } else {
+
+                // No explanation needed; request the permission
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.INTERNET}, 0);
+
+                Log.d("Permission", "Requesting !");
+            }
+        } else {
+            Log.d("Permission", "already Granted");
+        }
     }
 
 //    @Override
@@ -98,176 +146,233 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @SuppressLint("SetTextI18n")
     @Override
     public void onClick(View view){
+        final Dialog brushDialog;
+        ImageButton smallBtn, mediumBtn, largeBtn;
 
-        if(view.getId() == R.id.draw_btn){
-            //draw button clicked
-            final Dialog brushDialog = new Dialog(this);
-            brushDialog.setTitle("Brush size:");
-            brushDialog.setContentView(R.layout.brush_chooser);
-            //listen for clicks on size buttons
-            ImageButton smallBtn = brushDialog.findViewById(R.id.small_brush);
-            smallBtn.setOnClickListener(new View.OnClickListener(){
-                @Override
-                public void onClick(View v) {
-                    drawView.setErase(false);
-                    drawView.setBrushSize(smallBrush);
-                    drawView.setLastBrushSize(smallBrush);
-                    brushDialog.dismiss();
-                }
-            });
-            ImageButton mediumBtn = brushDialog.findViewById(R.id.medium_brush);
-            mediumBtn.setOnClickListener(new View.OnClickListener(){
-                @Override
-                public void onClick(View v) {
-                    drawView.setErase(false);
-                    drawView.setBrushSize(mediumBrush);
-                    drawView.setLastBrushSize(mediumBrush);
-                    brushDialog.dismiss();
-                }
-            });
-            ImageButton largeBtn = brushDialog.findViewById(R.id.large_brush);
-            largeBtn.setOnClickListener(new View.OnClickListener(){
-                @Override
-                public void onClick(View v) {
-                    drawView.setErase(false);
-                    drawView.setBrushSize(largeBrush);
-                    drawView.setLastBrushSize(largeBrush);
-                    brushDialog.dismiss();
-                }
-            });
-            //show and wait for user interaction
-            brushDialog.show();
-        }
-        else if(view.getId()==R.id.erase_btn){
-            //switch to erase - choose size
-            final Dialog brushDialog = new Dialog(this);
-            brushDialog.setTitle("Eraser size:");
-            brushDialog.setContentView(R.layout.brush_chooser);
-            //size buttons
-            ImageButton smallBtn = brushDialog.findViewById(R.id.small_brush);
-            smallBtn.setOnClickListener(new View.OnClickListener(){
-                @Override
-                public void onClick(View v) {
-                    drawView.setErase(true);
-                    drawView.setBrushSize(smallBrush);
-                    brushDialog.dismiss();
-                }
-            });
-            ImageButton mediumBtn = brushDialog.findViewById(R.id.medium_brush);
-            mediumBtn.setOnClickListener(new View.OnClickListener(){
-                @Override
-                public void onClick(View v) {
-                    drawView.setErase(true);
-                    drawView.setBrushSize(mediumBrush);
-                    brushDialog.dismiss();
-                }
-            });
-            ImageButton largeBtn = brushDialog.findViewById(R.id.large_brush);
-            largeBtn.setOnClickListener(new View.OnClickListener(){
-                @Override
-                public void onClick(View v) {
-                    drawView.setErase(true);
-                    drawView.setBrushSize(largeBrush);
-                    brushDialog.dismiss();
-                }
-            });
-            brushDialog.show();
-        }
-        else if(view.getId()==R.id.new_btn){
-            //new button
-            AlertDialog.Builder newDialog = new AlertDialog.Builder(this);
-            newDialog.setTitle("New drawing");
-            newDialog.setMessage("Start new drawing (you will lose the current drawing)?");
-            newDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener(){
-                public void onClick(DialogInterface dialog, int which){
-                    drawView.startNew();
-                    dialog.dismiss();
-                }
-            });
-            newDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener(){
-                public void onClick(DialogInterface dialog, int which){
-                    dialog.cancel();
-                }
-            });
-            newDialog.show();
-        }
-        else if(view.getId()==R.id.save_btn){
-            //save drawing
-            AlertDialog.Builder saveDialog = new AlertDialog.Builder(this);
-            saveDialog.setTitle("Save drawing");
-            saveDialog.setMessage("Save drawing to device Gallery?");
-            saveDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener(){
-                public void onClick(DialogInterface dialog, int which){
-                    //save drawing
-                    drawView.setDrawingCacheEnabled(true);
-                    //attempt to save
-                    String imgSaved = MediaStore.Images.Media.insertImage(
-                            getContentResolver(), drawView.getDrawingCache(),
-                            UUID.randomUUID().toString()+".png", "drawing");
-                    //feedback
-                    if(imgSaved!=null){
-                        Toast savedToast = Toast.makeText(getApplicationContext(),
-                                "Drawing saved to Gallery!", Toast.LENGTH_SHORT);
-                        savedToast.show();
+        switch(view.getId()) {
+            case R.id.draw_btn:
+                //draw button clicked
+                brushDialog = new Dialog(this);
+                brushDialog.setTitle("Brush size:");
+                brushDialog.setContentView(R.layout.brush_chooser);
+                //listen for clicks on size buttons
+                smallBtn = brushDialog.findViewById(R.id.small_brush);
+                smallBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        drawView.setErase(false);
+                        drawView.setBrushSize(smallBrush);
+                        drawView.setLastBrushSize(smallBrush);
+                        brushDialog.dismiss();
                     }
-                    else{
-                        Toast unsavedToast = Toast.makeText(getApplicationContext(),
-                                "Oops! Image could not be saved.", Toast.LENGTH_SHORT);
-                        unsavedToast.show();
+                });
+                mediumBtn = brushDialog.findViewById(R.id.medium_brush);
+                mediumBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        drawView.setErase(false);
+                        drawView.setBrushSize(mediumBrush);
+                        drawView.setLastBrushSize(mediumBrush);
+                        brushDialog.dismiss();
                     }
-                    drawView.destroyDrawingCache();
-                }
-            });
-            saveDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener(){
-                public void onClick(DialogInterface dialog, int which){
-                    dialog.cancel();
-                }
-            });
-            saveDialog.show();
-        }
-        else if(view.getId()==R.id.opacity_btn){
-            //launch opacity chooser
-            final Dialog seekDialog = new Dialog(this);
-            seekDialog.setTitle("Opacity level:");
-            seekDialog.setContentView(R.layout.opacity_chooser);
-            //get ui elements
-            final TextView seekTxt = seekDialog.findViewById(R.id.opq_txt);
-            final SeekBar seekOpq = seekDialog.findViewById(R.id.opacity_seek);
-            //set max
-            seekOpq.setMax(100);
-            //show current level
-            int currLevel = drawView.getPaintAlpha();
-            seekTxt.setText(currLevel+"%");
-            seekOpq.setProgress(currLevel);
-            //update as user interacts
-            seekOpq.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                });
+                largeBtn = brushDialog.findViewById(R.id.large_brush);
+                largeBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        drawView.setErase(false);
+                        drawView.setBrushSize(largeBrush);
+                        drawView.setLastBrushSize(largeBrush);
+                        brushDialog.dismiss();
+                    }
+                });
+                //show and wait for user interaction
+                brushDialog.show();
+                break;
 
-                @SuppressLint("SetTextI18n")
-                @Override
-                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                    seekTxt.setText(Integer.toString(progress)+"%");
-                }
+            case R.id.erase_btn:
+                //switch to erase - choose size
+                brushDialog = new Dialog(this);
+                brushDialog.setTitle("Eraser size:");
+                brushDialog.setContentView(R.layout.brush_chooser);
+                //size buttons
+                smallBtn = brushDialog.findViewById(R.id.small_brush);
+                smallBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        drawView.setErase(true);
+                        drawView.setBrushSize(smallBrush);
+                        brushDialog.dismiss();
+                    }
+                });
+                mediumBtn = brushDialog.findViewById(R.id.medium_brush);
+                mediumBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        drawView.setErase(true);
+                        drawView.setBrushSize(mediumBrush);
+                        brushDialog.dismiss();
+                    }
+                });
+                largeBtn = brushDialog.findViewById(R.id.large_brush);
+                largeBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        drawView.setErase(true);
+                        drawView.setBrushSize(largeBrush);
+                        brushDialog.dismiss();
+                    }
+                });
+                brushDialog.show();
+                break;
 
-                @Override
-                public void onStartTrackingTouch(SeekBar seekBar) {}
+            case R.id.new_btn:
+                //new button
+                AlertDialog.Builder newDialog = new AlertDialog.Builder(this);
+                newDialog.setTitle("New drawing");
+                newDialog.setMessage("Start new drawing (you will lose the current drawing)?");
+                newDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        drawView.startNew();
+                        dialog.dismiss();
+                    }
+                });
+                newDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+                newDialog.show();
+                break;
 
-                @Override
-                public void onStopTrackingTouch(SeekBar seekBar) {}
+            case R.id.opacity_btn:
+                //launch opacity chooser
+                final Dialog seekDialog = new Dialog(this);
+                seekDialog.setTitle("Opacity level:");
+                seekDialog.setContentView(R.layout.opacity_chooser);
+                //get ui elements
+                final TextView seekTxt = seekDialog.findViewById(R.id.opq_txt);
+                final SeekBar seekOpq = seekDialog.findViewById(R.id.opacity_seek);
+                //set max
+                seekOpq.setMax(100);
+                //show current level
+                int currLevel = drawView.getPaintAlpha();
+                seekTxt.setText(currLevel + "%");
+                seekOpq.setProgress(currLevel);
+                //update as user interacts
+                seekOpq.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 
-            });
-            //listen for clicks on ok
-            Button opqBtn = seekDialog.findViewById(R.id.opq_ok);
-            opqBtn.setOnClickListener(new View.OnClickListener(){
-                @Override
-                public void onClick(View v) {
-                    drawView.setPaintAlpha(seekOpq.getProgress());
-                    seekDialog.dismiss();
-                }
-            });
-            //show dialog
-            seekDialog.show();
+                    @SuppressLint("SetTextI18n")
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                        seekTxt.setText(Integer.toString(progress) + "%");
+                    }
+
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+                    }
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+                    }
+
+                });
+                //listen for clicks on ok
+                Button opqBtn = seekDialog.findViewById(R.id.opq_ok);
+                opqBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        drawView.setPaintAlpha(seekOpq.getProgress());
+                        seekDialog.dismiss();
+                    }
+                });
+                //show dialog
+                seekDialog.show();
+                break;
+
+            case R.id.save_btn:
+                //save drawing
+                AlertDialog.Builder saveDialog = new AlertDialog.Builder(this);
+                saveDialog.setTitle("Save drawing");
+                saveDialog.setMessage("Save drawing to device Gallery?");
+                saveDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        //save drawing
+                        drawView.setDrawingCacheEnabled(true);
+                        //attempt to save
+                        String imgSaved = MediaStore.Images.Media.insertImage(
+                                getContentResolver(), drawView.getDrawingCache(),
+                                UUID.randomUUID().toString() + ".png", "drawing");
+                        //feedback
+                        if (imgSaved != null) {
+                            Toast.makeText(getApplicationContext(),
+                                    "Drawing saved to Gallery!", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(getApplicationContext(),
+                                    "Oops! Image could not be saved.", Toast.LENGTH_SHORT).show();
+                        }
+                        drawView.destroyDrawingCache();
+                    }
+                });
+                saveDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+                saveDialog.show();
+                break;
+
+            case R.id.magic_btn:
+                String url = BASE_URL;
+
+                StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                        new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String response) {
+                                // Display the first 500 characters of the response string.
+                                Log.d("Volley", "Request sent");
+                                Toast.makeText(getApplicationContext(), "Volley Response is: "+ response.substring(0,500), Toast.LENGTH_SHORT).show();
+                            }
+                        }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        NetworkResponse networkResponse = error.networkResponse;
+
+                        Toast.makeText(getApplicationContext(), "Volley request error: " + networkResponse.statusCode, Toast.LENGTH_SHORT).show();
+
+                        Log.d("Volley", "Request error: " + networkResponse.statusCode);
+                        error.printStackTrace();
+                    }
+                });
+                queue.add(stringRequest);
+
+                break;
         }
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case 0: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+                    Log.d("Permission", "Granted");
+                } else {
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                    Log.d("Permission", "Not granted");
+                }
+                return;
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request.
+        }
+    }
 }
 

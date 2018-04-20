@@ -138,7 +138,7 @@ public class DrawingView extends View {
 
     //set erase true or false
     public void setErase(boolean isErase){
-        erase=isErase;
+        erase = isErase;
         if(erase) drawPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
         else drawPaint.setXfermode(null);
     }
@@ -156,7 +156,7 @@ public class DrawingView extends View {
 
     //set alpha
     public void setPaintAlpha(int newAlpha){
-        paintAlpha=Math.round((float)newAlpha/100*255);
+        paintAlpha = Math.round((float)newAlpha/100*255);
         drawPaint.setColor(paintColor);
         drawPaint.setAlpha(paintAlpha);
     }
