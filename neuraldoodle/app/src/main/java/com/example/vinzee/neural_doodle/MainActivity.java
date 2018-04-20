@@ -6,11 +6,13 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -28,6 +30,9 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import java.io.ByteArrayOutputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
@@ -40,6 +45,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private float smallBrush, mediumBrush, largeBrush;
     private RequestQueue queue;
     private final String BASE_URL = "http://130.85.94.233:5000";
+    private String imgURL = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +73,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         //set initial size
         drawView.setBrushSize(mediumBrush);
+        drawView.setDrawingCacheEnabled(true);
+        drawView.setDrawingCacheBackgroundColor(0xfffafafa);
+        drawView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+
 
         //erase button
         eraseBtn = findViewById(R.id.erase_btn);
@@ -87,7 +97,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //opacity
         magicBtn = findViewById(R.id.magic_btn);
         magicBtn.setOnClickListener(this);
-
 
         // Here, thisActivity is the current activity
         if (ContextCompat.checkSelfPermission(this,
@@ -298,15 +307,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 saveDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         //save drawing
-                        drawView.setDrawingCacheEnabled(true);
+//                        drawView.setDrawingCacheEnabled(true);
+//                        drawView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+
                         //attempt to save
-                        String imgSaved = MediaStore.Images.Media.insertImage(
+                        imgURL = MediaStore.Images.Media.insertImage(
                                 getContentResolver(), drawView.getDrawingCache(),
                                 UUID.randomUUID().toString() + ".png", "drawing");
                         //feedback
-                        if (imgSaved != null) {
+                        if (imgURL != null) {
                             Toast.makeText(getApplicationContext(),
-                                    "Drawing saved to Gallery!", Toast.LENGTH_SHORT).show();
+                                    "Drawing saved to Gallery: " + imgURL, Toast.LENGTH_SHORT).show();
                         } else {
                             Toast.makeText(getApplicationContext(),
                                     "Oops! Image could not be saved.", Toast.LENGTH_SHORT).show();
@@ -323,9 +334,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.magic_btn:
-                String url = BASE_URL;
+//                if (imgURL == null) {
+//                    Log.d("Volley", "imgURL empty");
+//                    Toast.makeText(getApplicationContext(), "imgURL empty!", Toast.LENGTH_SHORT).show();
+//                    return;
+//                }
 
-                StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                StringRequest stringRequest = new StringRequest(Request.Method.POST, BASE_URL,
                         new Response.Listener<String>() {
                             @Override
                             public void onResponse(String response) {
@@ -343,11 +358,41 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         Log.d("Volley", "Request error: " + networkResponse.statusCode);
                         error.printStackTrace();
                     }
-                });
+                }){
+                    @Override
+                    protected Map<String, String> getParams() {
+                        Map<String,String> param = new HashMap<>();
+
+                        Bitmap bitmap;
+//                        try {
+//                            bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), Uri.parse(imgURL));
+//                        } catch (IOException e) {
+//                            e.printStackTrace();
+//                        }
+
+                        bitmap = drawView.getDrawingCache();
+
+                        String images = getStringImage(bitmap);
+                        Log.i("String Image :: ",""+images);
+                        param.put("files", images);
+
+                        return param;
+                    }
+                };;
                 queue.add(stringRequest);
 
                 break;
         }
+    }
+
+    public String getStringImage(Bitmap bitmap){
+        Log.i("getStringImage","Bitmap:: " + bitmap);
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG,100, baos);
+        byte[] b = baos.toByteArray();
+
+        return Base64.encodeToString(b, Base64.DEFAULT);
     }
 
     @Override
