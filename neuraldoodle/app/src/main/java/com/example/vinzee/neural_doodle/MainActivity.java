@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -40,20 +41,12 @@ import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    //custom drawing view
     private DrawingView drawView;
-    //buttons
     private ImageButton currPaint, drawBtn, eraseBtn, newBtn, saveBtn, opacityBtn, magicBtn;
-    //sizes
     private float smallBrush, mediumBrush, largeBrush;
     private RequestQueue queue;
     private final String BASE_URL = "http://43a87bf7.ngrok.io";
     private String imgURL = null;
-
-    private final String twoHyphens = "--";
-    private final String lineEnd = "\r\n";
-    private final String boundary = "apiclient-" + System.currentTimeMillis();
-    private final String mimeType = "multipart/form-data;boundary=" + boundary;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,13 +125,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Log.d("Permission", "already Granted");
         }
     }
-
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        // Inflate the menu; this adds items to the action bar if it is present.
-//        getMenuInflater().inflate(R.menu.main, menu);
-//        return true;
-//    }
 
     //user clicked paint
     public void paintClicked(View view){
@@ -344,17 +330,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onResponse(NetworkResponse response) {
                         String resultResponse = new String(response.data);
-                        try {
-                            Log.i("resultResponse: ", resultResponse);
+                        String imageURL = BASE_URL + "/" + resultResponse;
 
-                            JSONObject result = new JSONObject(resultResponse);
-                            String status = result.getString("status");
-                            String message = result.getString("message");
+                        Log.i("resultResponse: ", imageURL);
 
-                            Log.i("Messsage", status + " , " + message);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
+                        Intent myIntent = new Intent(MainActivity.this, SketchActivity.class);
+                        myIntent.putExtra("imageURL", imageURL); //Optional parameters
+                        MainActivity.this.startActivity(myIntent);
                     }
                 }, new Response.ErrorListener() {
                     @Override
