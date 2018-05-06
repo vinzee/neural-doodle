@@ -4,8 +4,8 @@ from flask import send_from_directory
 import subprocess
 import time
 
-UPLOAD_FOLDER = '/media/vipin/SSD/Grad_study/Spring 2018/Mobile Computing/FinalProject/resources/uploads'
-RESULT_FOLDER = '/media/vipin/SSD/Grad_study/Spring 2018/Mobile Computing/FinalProject/webapp'
+UPLOAD_FOLDER = '/media/vipin/SSD/Grad_study/Spring 2018/Mobile Computing/FinalProject/neural-doodle/resources/uploads'
+RESULT_FOLDER = '/media/vipin/SSD/Grad_study/Spring 2018/Mobile Computing/FinalProject/neural-doodle/webapp'
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
 
 app = Flask(__name__)
@@ -35,14 +35,16 @@ def upload_file():
             flash('No selected file')
             return redirect(request.url)
         if file and allowed_file(file.filename):
-            # filename = secure_filename(file.filename)
-            filename = 'test.jpg'
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            p1 = subprocess.Popen(["python ../../project/fast-neural-doodle/get_mask_hdf5.py --n_colors=4 --style_image=../../project/fast-neural-doodle/data/Renoir/style.png --style_mask=../../project/fast-neural-doodle/data/Renoir/style_mask.png --target_mask=../../project/fast-neural-doodle/data/Renoir/target_mask.png"], shell=True)
-            p2 = subprocess.Popen(["th ../../project/fast-neural-doodle/fast_neural_doodle.lua -masks_hdf5 ../../project/fast-neural-doodle/masks.hdf5"], shell=True)
+            filename = file.filename
+            # filename = 'test.jpg'
+            target_mask_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(target_mask_path)
+            # p1 = subprocess.Popen(["python ../../../project/fast-neural-doodle/get_mask_hdf5.py --n_colors=4 --style_image=../../../project/fast-neural-doodle/data/Renoir/style.png --style_mask=../../../project/fast-neural-doodle/data/Renoir/style_mask.png --target_mask=../../../project/fast-neural-doodle/data/Renoir/target_mask.png"], shell=True)
+            p1 = subprocess.Popen(["python ../../../project/fast-neural-doodle/get_mask_hdf5.py --n_colors=4 --style_image=../../../project/fast-neural-doodle/data/Renoir/style.png --style_mask=../../../project/fast-neural-doodle/data/Renoir/style_mask.png --target_mask=../resources/uploads/" + str(filename)], shell=True)
+            p2 = subprocess.Popen(["th ../../../project/fast-neural-doodle/fast_neural_doodle.lua -masks_hdf5 masks.hdf5"], shell=True)
             p1.wait()
             p2.wait()
-            if not os.path.exists('/media/vipin/SSD/Grad_study/Spring 2018/Mobile Computing/FinalProject/webapp/out.png'):
+            if not os.path.exists('/media/vipin/SSD/Grad_study/Spring 2018/Mobile Computing/FinalProject/neural-doodle/webapp/out.png'):
                 print 'Waiting for results'
                 time.sleep(10)
             filename='out.png'
