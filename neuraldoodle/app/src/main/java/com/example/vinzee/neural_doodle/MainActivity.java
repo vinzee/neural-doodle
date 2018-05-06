@@ -1,7 +1,6 @@
 package com.example.vinzee.neural_doodle;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -12,7 +11,6 @@ import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -22,13 +20,18 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.NetworkResponse;
+import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
+import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
@@ -44,8 +47,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     //sizes
     private float smallBrush, mediumBrush, largeBrush;
     private RequestQueue queue;
-    private final String BASE_URL = "http://130.85.94.233:5000";
+    private final String BASE_URL = "http://43a87bf7.ngrok.io";
     private String imgURL = null;
+
+    private final String twoHyphens = "--";
+    private final String lineEnd = "\r\n";
+    private final String boundary = "apiclient-" + System.currentTimeMillis();
+    private final String mimeType = "multipart/form-data;boundary=" + boundary;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -152,7 +160,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    @SuppressLint("SetTextI18n")
     @Override
     public void onClick(View view){
         final Dialog brushDialog;
@@ -271,7 +278,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 //update as user interacts
                 seekOpq.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 
-                    @SuppressLint("SetTextI18n")
                     @Override
                     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                         seekTxt.setText(Integer.toString(progress) + "%");
@@ -314,7 +320,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         imgURL = MediaStore.Images.Media.insertImage(
                                 getContentResolver(), drawView.getDrawingCache(),
                                 UUID.randomUUID().toString() + ".png", "drawing");
-                        //feedback
+                        // feedback
                         if (imgURL != null) {
                             Toast.makeText(getApplicationContext(),
                                     "Drawing saved to Gallery: " + imgURL, Toast.LENGTH_SHORT).show();
@@ -334,65 +340,92 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.magic_btn:
-//                if (imgURL == null) {
-//                    Log.d("Volley", "imgURL empty");
-//                    Toast.makeText(getApplicationContext(), "imgURL empty!", Toast.LENGTH_SHORT).show();
-//                    return;
-//                }
+                VolleyMultipartRequest multipartRequest = new VolleyMultipartRequest(Request.Method.POST, BASE_URL, new Response.Listener<NetworkResponse>() {
+                    @Override
+                    public void onResponse(NetworkResponse response) {
+                        String resultResponse = new String(response.data);
+                        try {
+                            Log.i("resultResponse: ", resultResponse);
 
-                StringRequest stringRequest = new StringRequest(Request.Method.POST, BASE_URL,
-                        new Response.Listener<String>() {
-                            @Override
-                            public void onResponse(String response) {
-                                // Display the first 500 characters of the response string.
-                                Log.d("Volley", "Request sent");
-                                Toast.makeText(getApplicationContext(), "Volley Response is: "+ response.substring(0,500), Toast.LENGTH_SHORT).show();
-                            }
-                        }, new Response.ErrorListener() {
+                            JSONObject result = new JSONObject(resultResponse);
+                            String status = result.getString("status");
+                            String message = result.getString("message");
+
+                            Log.i("Messsage", status + " , " + message);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         NetworkResponse networkResponse = error.networkResponse;
+                        String errorMessage = "Unknown error";
+                        if (networkResponse == null) {
+                            if (error.getClass().equals(TimeoutError.class)) {
+                                errorMessage = "Request timeout";
+                            } else if (error.getClass().equals(NoConnectionError.class)) {
+                                errorMessage = "Failed to connect server";
+                            }
+                        } else {
+                            String result = new String(networkResponse.data);
+                            try {
+                                JSONObject response = new JSONObject(result);
+                                String status = response.getString("status");
+                                String message = response.getString("message");
 
-                        Toast.makeText(getApplicationContext(), "Volley request error: " + networkResponse.statusCode, Toast.LENGTH_SHORT).show();
+                                Log.e("Error Status", status);
+                                Log.e("Error Message", message);
 
-                        Log.d("Volley", "Request error: " + networkResponse.statusCode);
+                                if (networkResponse.statusCode == 404) {
+                                    errorMessage = "Resource not found";
+                                } else if (networkResponse.statusCode == 401) {
+                                    errorMessage = message+" Please login again";
+                                } else if (networkResponse.statusCode == 400) {
+                                    errorMessage = message+ " Check your inputs";
+                                } else if (networkResponse.statusCode == 500) {
+                                    errorMessage = message+" Something is getting wrong";
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        Log.i("Error", errorMessage);
                         error.printStackTrace();
                     }
-                }){
+                }) {
+//                    @Override
+//                    protected Map<String, String> getParams() {
+//                        Map<String, String> params = new HashMap<>();
+//                        params.put("contact", mContactInput.getText().toString());
+//                        return params;
+//                    }
+
                     @Override
-                    protected Map<String, String> getParams() {
-                        Map<String,String> param = new HashMap<>();
+                    protected Map<String, DataPart> getByteData() {
+                        Map<String, DataPart> params = new HashMap<>();
+                        // file name could found file base or direct access from real path
+                        // for now just get bitmap data from ImageView
 
-                        Bitmap bitmap;
-//                        try {
-//                            bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), Uri.parse(imgURL));
-//                        } catch (IOException e) {
-//                            e.printStackTrace();
-//                        }
+                        params.put("file", new DataPart("test.png", getFileDataFromDrawable(drawView.getDrawingCache()), "image/png"));
 
-                        bitmap = drawView.getDrawingCache();
-
-                        String images = getStringImage(bitmap);
-                        Log.i("String Image :: ",""+images);
-                        param.put("files", images);
-
-                        return param;
+                        return params;
                     }
-                };;
-                queue.add(stringRequest);
+                };
+
+                multipartRequest.setRetryPolicy(new DefaultRetryPolicy(0, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+                multipartRequest.setShouldCache(false);
+
+                queue.add(multipartRequest);
 
                 break;
         }
     }
 
-    public String getStringImage(Bitmap bitmap){
-        Log.i("getStringImage","Bitmap:: " + bitmap);
-
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG,100, baos);
-        byte[] b = baos.toByteArray();
-
-        return Base64.encodeToString(b, Base64.DEFAULT);
+    public static byte[] getFileDataFromDrawable(Bitmap bitmap) {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 0, byteArrayOutputStream);
+        return byteArrayOutputStream.toByteArray();
     }
 
     @Override
