@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "720912319429",
+    "firebase_url": "https://neuraldoodle.firebaseio.com",
+    "project_id": "neuraldoodle",
+    "storage_bucket": "neuraldoodle.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:720912319429:android:7cc52001f235bae7",
+        "android_client_info": {
+          "package_name": "com.example.vinzee.neural_doodle"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "720912319429-0vepmeq5q0l81j1t3nsg2k9h6pjolshr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.vinzee.neural_doodle",
+            "certificate_hash": "abb4d303d5fa6509ff99d016f408ec2e7d74c258"
+          }
+        },
+        {
+          "client_id": "720912319429-ecprnrbfpi936arbmikl83jpt9euvq9b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDlMzAEEINtph5A-wLw1l1n6ChonDnmITU"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "720912319429-ecprnrbfpi936arbmikl83jpt9euvq9b.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
