@@ -13,6 +13,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -30,6 +32,7 @@ import com.android.volley.Response;
 import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
+import com.google.firebase.auth.FirebaseAuth;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -49,6 +52,7 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
     private float smallBrush, mediumBrush, largeBrush;
     private RequestQueue queue;
     private final String BASE_URL = "http://43a87bf7.ngrok.io";
+    private FirebaseAuth auth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,6 +104,7 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
         //opacity
         magicBtn = findViewById(R.id.magic_btn);
         magicBtn.setOnClickListener(this);
+        auth = FirebaseAuth.getInstance();
 
         // Here, thisActivity is the current activity
         if (ContextCompat.checkSelfPermission(this,
@@ -147,6 +152,31 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
                 Log.d("Permission", "Requesting !");
             }
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        //R.id.action_settings
+        switch (item.getItemId()) {
+            case R.id.settings:Intent intent = new Intent(this, UpdateUserProfileActivity.class);
+                startActivity(intent);
+                return true;
+
+            case R.id.logout:
+                auth.signOut();
+                Intent loginIntent = new Intent(this, LoginActivity.class);
+                startActivity(loginIntent);
+                finish();
+                return true;
+        }
+        return false;
+
     }
 
     //user clicked paint

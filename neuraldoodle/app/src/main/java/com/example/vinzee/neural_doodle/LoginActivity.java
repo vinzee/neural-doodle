@@ -35,6 +35,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             startActivity(new Intent(LoginActivity.this, CanvasActivity.class));
             finish();
         }
+        
         setContentView(R.layout.activity_login);
 
         inputEmail = (EditText) findViewById(R.id.email);
@@ -60,8 +61,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             case R.id.btn_signup:
                 startActivity(new Intent(this, SignupActivity.class));
                 break;
-//            case R.id.btn_reset_password:startActivity(new Intent(LoginActivity.this, ResetPasswordActivity.class));
-//                break;
+            case R.id.btn_reset_password:
+                startActivity(new Intent(this, ResetPasswordActivity.class));
+                break;
         }
     }
 
