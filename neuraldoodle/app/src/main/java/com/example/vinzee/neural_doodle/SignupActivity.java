@@ -94,7 +94,6 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
         mStorageRef = FirebaseStorage.getInstance().getReference();
         mFirebaseInstance = FirebaseDatabase.getInstance();
         mFirebaseDatabase = mFirebaseInstance.getReference("users");
-        mFirebaseInstance.getReference("app_title").setValue("Imagination Station");
         // app_title change listener
         mFirebaseInstance.getReference("app_title").addValueEventListener(new ValueEventListener() {
             @Override
@@ -379,8 +378,6 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
 
 
     private void uploadImage(Bitmap profileBitmap, final String uid, String type){
-
-
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         profileBitmap.compress(Bitmap.CompressFormat.JPEG,80,baos);
         byte[] data= baos.toByteArray();
