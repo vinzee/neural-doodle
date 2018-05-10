@@ -89,8 +89,8 @@ public class HomeActivity extends AppCompatActivity {
                 finish();
                 return true;
         }
-        return false;
 
+        return false;
     }
 
     private void pushFragment(ChatFragment chatFragment){

@@ -10,7 +10,6 @@ public class User {
     public String interests;
 
     public User(){
-
     }
 
     public User(String name, String email, String phone, String address, String userType, String userBio, String interests) {

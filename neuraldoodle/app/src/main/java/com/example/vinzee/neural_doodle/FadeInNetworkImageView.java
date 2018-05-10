@@ -35,5 +35,4 @@ public class FadeInNetworkImageView extends NetworkImageView {
         setImageDrawable(td);
         td.startTransition(FADE_IN_TIME_MS);
     }
-
 }
