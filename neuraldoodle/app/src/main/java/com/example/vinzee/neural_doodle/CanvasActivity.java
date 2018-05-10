@@ -351,9 +351,6 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
                 saveDialog.setMessage("Save drawing to device Gallery?");
                 saveDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        //save drawing
-//                        drawView.setDrawingCacheEnabled(true);
-//                        drawView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
 
                         //attempt to save
                         String imgURL = MediaStore.Images.Media.insertImage(
