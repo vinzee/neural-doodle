@@ -1,19 +1,21 @@
 package com.example.vinzee.neural_doodle;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Base64;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -22,21 +24,34 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.NetworkResponse;
+import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
+import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
+public class CanvasActivity extends AppCompatActivity implements View.OnClickListener {
     //custom drawing view
     private DrawingView drawView;
     //buttons
@@ -44,15 +59,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     //sizes
     private float smallBrush, mediumBrush, largeBrush;
     private RequestQueue queue;
-    private final String BASE_URL = "http://130.85.94.233:5000";
-    private String imgURL = null;
+    private final String BASE_URL = "http://43a87bf7.ngrok.io";
+    private FirebaseAuth auth;
+    private StorageReference mStorageRef;
+    User user=new User();
+    private String projectName;
+    private String projectId;
+    private String userId;
+    private String style;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
+        setContentView(R.layout.activity_canvas);
+        Intent intent = getIntent();
+        projectId = intent.getStringExtra("projectId");
+        userId = intent.getStringExtra("userId");
+        projectName = intent.getStringExtra("projectName");
+        style = intent.getStringExtra("style");
         queue = Volley.newRequestQueue(this);
+
+        mStorageRef = FirebaseStorage.getInstance().getReference();
 
         //get drawing view
         drawView = findViewById(R.id.drawing);
@@ -97,6 +124,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //opacity
         magicBtn = findViewById(R.id.magic_btn);
         magicBtn.setOnClickListener(this);
+        auth = FirebaseAuth.getInstance();
 
         // Here, thisActivity is the current activity
         if (ContextCompat.checkSelfPermission(this,
@@ -120,17 +148,56 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 Log.d("Permission", "Requesting !");
             }
-        } else {
-            Log.d("Permission", "already Granted");
+        }
+
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            Log.d("Permission", "already Not granted");
+            // Permission is not granted
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+
+            } else {
+
+                // No explanation needed; request the permission
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
+
+                Log.d("Permission", "Requesting !");
+            }
         }
     }
 
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        // Inflate the menu; this adds items to the action bar if it is present.
-//        getMenuInflater().inflate(R.menu.main, menu);
-//        return true;
-//    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        //R.id.action_settings
+        switch (item.getItemId()) {
+            case R.id.settings:Intent intent = new Intent(this, UpdateUserProfileActivity.class);
+                startActivity(intent);
+                return true;
+
+            case R.id.logout:
+                auth.signOut();
+                Intent loginIntent = new Intent(this, LoginActivity.class);
+                startActivity(loginIntent);
+                finish();
+                return true;
+        }
+        return false;
+
+    }
 
     //user clicked paint
     public void paintClicked(View view){
@@ -152,7 +219,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    @SuppressLint("SetTextI18n")
     @Override
     public void onClick(View view){
         final Dialog brushDialog;
@@ -271,7 +337,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 //update as user interacts
                 seekOpq.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 
-                    @SuppressLint("SetTextI18n")
                     @Override
                     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                         seekTxt.setText(Integer.toString(progress) + "%");
@@ -306,18 +371,36 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 saveDialog.setMessage("Save drawing to device Gallery?");
                 saveDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        //save drawing
-//                        drawView.setDrawingCacheEnabled(true);
-//                        drawView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
 
                         //attempt to save
-                        imgURL = MediaStore.Images.Media.insertImage(
+                        String imgURL = MediaStore.Images.Media.insertImage(
                                 getContentResolver(), drawView.getDrawingCache(),
                                 UUID.randomUUID().toString() + ".png", "drawing");
-                        //feedback
+                        // feedback
                         if (imgURL != null) {
                             Toast.makeText(getApplicationContext(),
                                     "Drawing saved to Gallery: " + imgURL, Toast.LENGTH_SHORT).show();
+                            // TODO - Save to DB
+                            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                            drawView.getDrawingCache().compress(Bitmap.CompressFormat.JPEG,80,baos);
+                            byte[] data= baos.toByteArray();
+
+                            StorageReference storageReference =
+                                    mStorageRef.child("images/"+projectId+"_project.png");
+
+                            UploadTask uploadTask = storageReference.putBytes(data);
+                            uploadTask.addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception exception) {
+                                    // Handle unsuccessful uploads
+                                    Toast.makeText(getApplicationContext(),"image upload failed ",Toast.LENGTH_LONG).show();
+                                }
+                            }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                @Override
+                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+                                }
+                            });
                         } else {
                             Toast.makeText(getApplicationContext(),
                                     "Oops! Image could not be saved.", Toast.LENGTH_SHORT).show();
@@ -334,65 +417,88 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.magic_btn:
-//                if (imgURL == null) {
-//                    Log.d("Volley", "imgURL empty");
-//                    Toast.makeText(getApplicationContext(), "imgURL empty!", Toast.LENGTH_SHORT).show();
-//                    return;
-//                }
+                VolleyMultipartRequest multipartRequest = new VolleyMultipartRequest(Request.Method.POST, BASE_URL + "?style=" +  style, new Response.Listener<NetworkResponse>() {
+                    @Override
+                    public void onResponse(NetworkResponse response) {
+                        String resultResponse = new String(response.data);
+                        String imageURL = BASE_URL + "/" + resultResponse;
 
-                StringRequest stringRequest = new StringRequest(Request.Method.POST, BASE_URL,
-                        new Response.Listener<String>() {
-                            @Override
-                            public void onResponse(String response) {
-                                // Display the first 500 characters of the response string.
-                                Log.d("Volley", "Request sent");
-                                Toast.makeText(getApplicationContext(), "Volley Response is: "+ response.substring(0,500), Toast.LENGTH_SHORT).show();
-                            }
-                        }, new Response.ErrorListener() {
+                        Log.i("resultResponse: ", imageURL);
+
+                        Intent myIntent = new Intent(CanvasActivity.this, SketchActivity.class);
+                        myIntent.putExtra("imageURL", imageURL); //Optional parameters
+                        CanvasActivity.this.startActivity(myIntent);
+                    }
+                }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         NetworkResponse networkResponse = error.networkResponse;
+                        String errorMessage = "Unknown error";
+                        if (networkResponse == null) {
+                            if (error.getClass().equals(TimeoutError.class)) {
+                                errorMessage = "Request timeout";
+                            } else if (error.getClass().equals(NoConnectionError.class)) {
+                                errorMessage = "Failed to connect server";
+                            }
+                        } else {
+                            String result = new String(networkResponse.data);
+                            try {
+                                JSONObject response = new JSONObject(result);
+                                String status = response.getString("status");
+                                String message = response.getString("message");
 
-                        Toast.makeText(getApplicationContext(), "Volley request error: " + networkResponse.statusCode, Toast.LENGTH_SHORT).show();
+                                Log.e("Error Status", status);
+                                Log.e("Error Message", message);
 
-                        Log.d("Volley", "Request error: " + networkResponse.statusCode);
+                                if (networkResponse.statusCode == 404) {
+                                    errorMessage = "Resource not found";
+                                } else if (networkResponse.statusCode == 401) {
+                                    errorMessage = message+" Please login again";
+                                } else if (networkResponse.statusCode == 400) {
+                                    errorMessage = message+ " Check your inputs";
+                                } else if (networkResponse.statusCode == 500) {
+                                    errorMessage = message+" Something is getting wrong";
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        Log.i("Error", errorMessage);
                         error.printStackTrace();
                     }
-                }){
+                }) {
                     @Override
                     protected Map<String, String> getParams() {
-                        Map<String,String> param = new HashMap<>();
-
-                        Bitmap bitmap;
-//                        try {
-//                            bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), Uri.parse(imgURL));
-//                        } catch (IOException e) {
-//                            e.printStackTrace();
-//                        }
-
-                        bitmap = drawView.getDrawingCache();
-
-                        String images = getStringImage(bitmap);
-                        Log.i("String Image :: ",""+images);
-                        param.put("files", images);
-
-                        return param;
+                        Map<String, String> params = new HashMap<>();
+                        params.put("style", style);
+                        return params;
                     }
-                };;
-                queue.add(stringRequest);
+
+                    @Override
+                    protected Map<String, DataPart> getByteData() {
+                        Map<String, DataPart> params = new HashMap<>();
+                        // file name could found file base or direct access from real path
+                        // for now just get bitmap data from ImageView
+
+                        params.put("file", new DataPart("test.png", getFileDataFromDrawable(drawView.getDrawingCache()), "image/png"));
+
+                        return params;
+                    }
+                };
+
+                multipartRequest.setRetryPolicy(new DefaultRetryPolicy(0, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+                multipartRequest.setShouldCache(false);
+
+                queue.add(multipartRequest);
 
                 break;
         }
     }
 
-    public String getStringImage(Bitmap bitmap){
-        Log.i("getStringImage","Bitmap:: " + bitmap);
-
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG,100, baos);
-        byte[] b = baos.toByteArray();
-
-        return Base64.encodeToString(b, Base64.DEFAULT);
+    public static byte[] getFileDataFromDrawable(Bitmap bitmap) {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 0, byteArrayOutputStream);
+        return byteArrayOutputStream.toByteArray();
     }
 
     @Override
@@ -420,4 +526,3 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 }
-
