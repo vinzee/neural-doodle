@@ -21,7 +21,7 @@ public class SketchActivity extends AppCompatActivity {
     private Handler handler = new Handler();
     private String imageURL;
     private int handlerCount = 0;
-    private static final int handlerCountThreshold = 10;
+    private static final int handlerCountThreshold = 15;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

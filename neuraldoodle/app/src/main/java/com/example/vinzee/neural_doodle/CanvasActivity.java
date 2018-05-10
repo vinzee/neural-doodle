@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -32,7 +33,14 @@ import com.android.volley.Response;
 import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -53,13 +61,25 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
     private RequestQueue queue;
     private final String BASE_URL = "http://43a87bf7.ngrok.io";
     private FirebaseAuth auth;
+    private StorageReference mStorageRef;
+    User user=new User();
+    private String projectName;
+    private String projectId;
+    private String userId;
+    private String style;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_canvas);
-
+        Intent intent = getIntent();
+        projectId = intent.getStringExtra("projectId");
+        userId = intent.getStringExtra("userId");
+        projectName = intent.getStringExtra("projectName");
+        style = intent.getStringExtra("style");
         queue = Volley.newRequestQueue(this);
+
+        mStorageRef = FirebaseStorage.getInstance().getReference();
 
         //get drawing view
         drawView = findViewById(R.id.drawing);
@@ -360,6 +380,27 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
                         if (imgURL != null) {
                             Toast.makeText(getApplicationContext(),
                                     "Drawing saved to Gallery: " + imgURL, Toast.LENGTH_SHORT).show();
+                            // TODO - Save to DB
+                            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                            drawView.getDrawingCache().compress(Bitmap.CompressFormat.JPEG,80,baos);
+                            byte[] data= baos.toByteArray();
+
+                            StorageReference storageReference =
+                                    mStorageRef.child("images/"+projectId+"_project.png");
+
+                            UploadTask uploadTask = storageReference.putBytes(data);
+                            uploadTask.addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception exception) {
+                                    // Handle unsuccessful uploads
+                                    Toast.makeText(getApplicationContext(),"image upload failed ",Toast.LENGTH_LONG).show();
+                                }
+                            }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                @Override
+                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+                                }
+                            });
                         } else {
                             Toast.makeText(getApplicationContext(),
                                     "Oops! Image could not be saved.", Toast.LENGTH_SHORT).show();
@@ -376,7 +417,7 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
                 break;
 
             case R.id.magic_btn:
-                VolleyMultipartRequest multipartRequest = new VolleyMultipartRequest(Request.Method.POST, BASE_URL, new Response.Listener<NetworkResponse>() {
+                VolleyMultipartRequest multipartRequest = new VolleyMultipartRequest(Request.Method.POST, BASE_URL + "?style=" +  style, new Response.Listener<NetworkResponse>() {
                     @Override
                     public void onResponse(NetworkResponse response) {
                         String resultResponse = new String(response.data);
@@ -426,12 +467,12 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
                         error.printStackTrace();
                     }
                 }) {
-//                    @Override
-//                    protected Map<String, String> getParams() {
-//                        Map<String, String> params = new HashMap<>();
-//                        params.put("contact", mContactInput.getText().toString());
-//                        return params;
-//                    }
+                    @Override
+                    protected Map<String, String> getParams() {
+                        Map<String, String> params = new HashMap<>();
+                        params.put("style", style);
+                        return params;
+                    }
 
                     @Override
                     protected Map<String, DataPart> getByteData() {

@@ -30,7 +30,7 @@ public class UpdateUserProfileActivity extends AppCompatActivity implements View
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_update_user_profile);
-        getSupportActionBar().setTitle("Imagination Station");
+        //getSupportActionBar().setTitle("Imagination Station");
         initUI();
 
 
