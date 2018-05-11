@@ -19,8 +19,7 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
 
     private FirebaseAuth auth;
     private StorageReference mStorageRef;
-    User user=new User();
-    private DatabaseReference mFirebaseDatabase;
+        private DatabaseReference mFirebaseDatabase;
     private FirebaseDatabase mFirebaseInstance;
     private EditText projectNameText;
     private Button beginButton;

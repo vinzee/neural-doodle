@@ -25,7 +25,7 @@ public class HomeActivity extends AppCompatActivity {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.navigation_home:
-                    pushFragment(new ProjectFragment());
+                    pushFragment(new ProjectsFragment());
                     return true;
                 case R.id.navigation_messages:
                     pushFragment(new ChatFragment());
@@ -41,11 +41,9 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getSupportActionBar().setTitle("Imagination Station");
-
 
         setContentView(R.layout.activity_home);
-        pushFragment(new ProjectFragment());
+        pushFragment(new ProjectsFragment());
         //get firebase auth instance
         auth = FirebaseAuth.getInstance();
 
@@ -106,7 +104,7 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
-    private void pushFragment(ProjectFragment projectFragment){
+    private void pushFragment(ProjectsFragment projectFragment){
         if(projectFragment ==null)    {
             return;
         }
