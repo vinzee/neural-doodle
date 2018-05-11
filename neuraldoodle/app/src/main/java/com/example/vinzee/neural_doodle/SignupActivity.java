@@ -82,8 +82,6 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
     private Bitmap profileBitmap,artBitmap;
     private ImageView profileImg;
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,7 +92,6 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
         mStorageRef = FirebaseStorage.getInstance().getReference();
         mFirebaseInstance = FirebaseDatabase.getInstance();
         mFirebaseDatabase = mFirebaseInstance.getReference("users");
-        mFirebaseInstance.getReference("app_title").setValue("Imagination Station");
         // app_title change listener
         mFirebaseInstance.getReference("app_title").addValueEventListener(new ValueEventListener() {
             @Override
@@ -126,7 +123,6 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
         edtName = (EditText)findViewById(R.id.name);
         edtAddress = (EditText)findViewById(R.id.address);
         edtPhone = (EditText) findViewById(R.id.phone);
-        edtEmail = (EditText) findViewById(R.id.email);
         edtBio = (EditText) findViewById(R.id.bio);
         tvInterests = (TextView) findViewById(R.id.userInterest);
         tvArtistArt = (TextView) findViewById(R.id.artistArt);
@@ -366,21 +362,18 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
                         selectedImage.compress(Bitmap.CompressFormat.JPEG,50,bytes);
                         //keep the image ready here to upload to db
                         tvArtistArt.setText(imageUri.toString());
-
-
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
                 break;
         }
-        //uploadImage(profileBitmap);
     }
 
 
-    private void uploadImage(Bitmap profileBitmap, final String uid, String type){
 
-
+    private void uploadImage(Bitmap profileBitmap, final String uid, String type)   {
+        progressBar.setVisibility(View.VISIBLE);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         profileBitmap.compress(Bitmap.CompressFormat.JPEG,80,baos);
         byte[] data= baos.toByteArray();
@@ -400,11 +393,11 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
 
             }
         });
-
-        //return profileimageUri;
+        progressBar.setVisibility(View.GONE);
     }
 
     private void attemptSignup()    {
+        progressBar.setVisibility(View.VISIBLE);
         final String email = inputEmail.getText().toString().trim();
         String password = inputPassword.getText().toString().trim();
 
@@ -439,6 +432,7 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
                         }
                     }
                 });
+        progressBar.setVisibility(View.GONE);
     }
 
     private void createProfile()    {
@@ -459,11 +453,6 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
 
     private void createUser(String name, String email, String phone, String address, String usertype, String userBio, String userInterests) {
 
-
-
-        //upload user profile image
-        //Uri imgUri= uploadImage(profileBitmap);
-
         uid=auth.getCurrentUser().getUid();
 
         User user = new User(name, email, phone, address, usertype, userBio, userInterests);
@@ -474,9 +463,9 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
             uploadImage(profileBitmap, uid,"profile");
         }
 
-        //TODO: PRASAD -> only do this if the user is an artist
-        //uploadImage(artBitmap,uid,"art");
-
+        if(usertype.equals("Artist") && artBitmap!=null) {
+            uploadImage(artBitmap, uid, "art");
+        }
         addUserChangeListener();
     }
 
@@ -494,11 +483,12 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
                     return;
                 }
                 Log.e(TAG, "User data is changed!" + user.name + ", " + user.email + ", "+ user.phone + ", "+ user.address+", "+user.userType);
+
                 // clear edit text
-                edtEmail.setText("");
+                inputEmail.setText("");
+                edtAddress.setText("");
                 edtName.setText("");
                 edtPhone.setText("");
-                edtAddress.setText("");
             }
 
             @Override
