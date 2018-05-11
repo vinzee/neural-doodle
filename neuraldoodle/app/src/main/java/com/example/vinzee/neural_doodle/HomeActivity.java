@@ -49,6 +49,7 @@ public class HomeActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_home);
         pushFragment(new ProjectFragment());
+
         auth = FirebaseAuth.getInstance();
 
         BottomNavigationView navigation = findViewById(R.id.navigation);

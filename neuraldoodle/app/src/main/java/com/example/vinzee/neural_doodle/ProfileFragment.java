@@ -257,12 +257,12 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             case PICK_IMAGE_CAMERA:
                 if(resultCode == linkedActivity.RESULT_OK){
                     try {
-                        //final Uri imageUri = imageReturnedIntent.getData();
                         final Bitmap selectedImage = (Bitmap) imageReturnedIntent.getExtras().get("data");
-                        profileBitmap=selectedImage;
+                        profileBitmap = selectedImage;
                         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
                         selectedImage.compress(Bitmap.CompressFormat.JPEG, 50, bytes);
                         profileImg.setImageBitmap(selectedImage);
+                        uploadImage(profileBitmap);
                     }
                     catch (NullPointerException e){
                         e.printStackTrace();
@@ -275,41 +275,24 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                         final Uri imageUri = imageReturnedIntent.getData();
                         final InputStream imageStream = linkedActivity.getContentResolver().openInputStream(imageUri);
                         final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
-                        profileBitmap=selectedImage;
+                        profileBitmap = selectedImage;
                         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
                         selectedImage.compress(Bitmap.CompressFormat.JPEG,50,bytes);
                         profileImg.setImageBitmap(selectedImage);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-                break;
-            case PICK_ARTIST_IMAGE:
-                if(resultCode == linkedActivity.RESULT_OK){
-                    try {
-                        final Uri imageUri = imageReturnedIntent.getData();
-                        final InputStream imageStream = linkedActivity.getContentResolver().openInputStream(imageUri);
-                        final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
-                        artBitmap=selectedImage;
-                        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-                        selectedImage.compress(Bitmap.CompressFormat.JPEG,50,bytes);
-
+                        uploadImage(profileBitmap);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
                 break;
         }
-        //uploadImage(profileBitmap);
     }
 
 
     private void uploadImage(Bitmap profileBitmap){
-
-
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         profileBitmap.compress(Bitmap.CompressFormat.JPEG,80,baos);
-        byte[] data= baos.toByteArray();
+        byte[] data = baos.toByteArray();
 
         StorageReference storageReference = mStorageRef.child("images/"+uid+"_"+"profile.jpg");
 
@@ -327,7 +310,10 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             }
         });
 
-        //return profileimageUri;
+        Glide.with(linkedActivity)
+                .using(new FirebaseImageLoader())
+                .load(storageReference)
+                .into(profileImg);
     }
 
     private void getProfileDetails() {
@@ -337,48 +323,44 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        // Get user value
                         user = dataSnapshot.getValue(User.class);
 
-                        if(user != null) {
+                        if (user != null) {
                             if (user.name != null && !user.name.isEmpty() && user.name.length() > 0) {
                                 edtName.setText(user.name);
-                            }
-                            else{
+                            } else{
                                 edtName.setText("");
                             }
                             if (user.address != null && !user.address.isEmpty() && user.address.length() > 0) {
                                 edtAddress.setText(user.address);
-                            }
-                            else{
+                            } else{
                                 edtAddress.setText("");
                             }
                             if (user.phone != null && !user.phone.isEmpty() && user.phone.length() > 0) {
                                 edtPhone.setText(user.phone);
-                            }
-                            else{
+                            } else{
                                 edtPhone.setText("");
                             }
                             if (user.userBio != null && !user.userBio.isEmpty() && user.userBio.length() > 0) {
                                 edtBio.setText(user.userBio);
-                            }
-                            else{
+                            } else{
                                 edtBio.setText("");
                             }
                             if (user.interests != null && !user.interests.isEmpty() && user.interests.length() > 0) {
                                 tvInterests.setText(user.interests);
-                            }
-                            else{
+                            } else{
                                 tvInterests.setText("");
                             }
+
                             mStorageRef = FirebaseStorage.getInstance().getReference();
+
                             StorageReference storageReference = mStorageRef.child("images/"+tempUserId+"_profile.jpg");
+
                             Glide.with(linkedActivity)
                                     .using(new FirebaseImageLoader())
                                     .load(storageReference)
                                     .into(profileImg);
-                        }
-                        else{
+                        } else{
                             edtName.setText("");
                             edtAddress.setText("");
                             edtPhone.setText("");
@@ -406,13 +388,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         DatabaseReference userProfileFirebaseDatabaseReference = mFirebaseDatabase.child("users").child(uid);
         userProfileFirebaseDatabaseReference.setValue(new_user);
 
-        if (profileBitmap != null) {
-            uploadImage(profileBitmap);
-        }
-
-        Toast.makeText(linkedActivity.getApplicationContext(),"Profile updated successfully" +
-                "",Toast.LENGTH_LONG).show();
-
+        Toast.makeText(linkedActivity.getApplicationContext(),"Profile updated successfully", Toast.LENGTH_LONG).show();
     }
 
 
