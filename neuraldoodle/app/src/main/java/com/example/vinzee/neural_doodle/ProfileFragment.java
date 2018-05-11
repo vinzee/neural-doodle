@@ -16,6 +16,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +28,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -55,7 +57,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private static final String TAG = SignupActivity.class.getSimpleName();
     private EditText edtName,edtAddress,edtPhone,edtBio;
     private Button btnUpload, btnSelectInterest;
-    private TextView tvInterests;
+//    private TextView tvInterests;
     private String uid;
     private FirebaseAuth auth;
     private StorageReference mStorageRef;
@@ -98,10 +100,10 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         edtAddress = (EditText) profileView.findViewById(R.id.address);
         edtPhone = (EditText) profileView.findViewById(R.id.phone);
         edtBio = (EditText) profileView.findViewById(R.id.bio);
-        tvInterests = (TextView) profileView.findViewById(R.id.userInterest);
+//        tvInterests = (TextView) profileView.findViewById(R.id.userInterest);
 
-        btnSelectInterest=(Button) profileView.findViewById(R.id.selectInterest);
-        btnSelectInterest.setOnClickListener(this);
+        /*btnSelectInterest=(Button) profileView.findViewById(R.id.selectInterest);
+        btnSelectInterest.setOnClickListener(this);*/
         btnUpload = (Button) profileView.findViewById(R.id.update_button);
         btnUpload.setOnClickListener(this);
 
@@ -149,9 +151,9 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             case R.id.update_button:
                 updateUser();
                 break;
-            case R.id.selectInterest:
+            /*case R.id.selectInterest:
                 getInterests();
-                break;
+                break;*/
             case R.id.btn_select_art:
                 Intent pickPhoto = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 startActivityForResult(pickPhoto, PICK_ARTIST_IMAGE);
@@ -159,7 +161,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    public void getInterests()    {
+/*    public void getInterests()    {
 
         final StringBuilder interests=new StringBuilder();
         final CharSequence[] dialogList = {"Abstract", "Cotemporary","Photorealism"};
@@ -206,7 +208,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             }
         })
         .show();
-    }
+    }*/
 
     public void loadImageFromStorage()  {
 
@@ -295,7 +297,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         byte[] data = baos.toByteArray();
 
         StorageReference storageReference = mStorageRef.child("images/"+uid+"_"+"profile.jpg");
-
+        final StorageReference storageReferencefinal = storageReference;
         UploadTask uploadTask = storageReference.putBytes(data);
         uploadTask.addOnFailureListener(new OnFailureListener() {
             @Override
@@ -306,14 +308,9 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-
             }
         });
 
-        Glide.with(linkedActivity)
-                .using(new FirebaseImageLoader())
-                .load(storageReference)
-                .into(profileImg);
     }
 
     private void getProfileDetails() {
@@ -346,26 +343,27 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                             } else{
                                 edtBio.setText("");
                             }
-                            if (user.interests != null && !user.interests.isEmpty() && user.interests.length() > 0) {
+                            /*if (user.interests != null && !user.interests.isEmpty() && user.interests.length() > 0) {
                                 tvInterests.setText(user.interests);
                             } else{
                                 tvInterests.setText("");
-                            }
+                            }*/
 
                             mStorageRef = FirebaseStorage.getInstance().getReference();
 
                             StorageReference storageReference = mStorageRef.child("images/"+tempUserId+"_profile.jpg");
-
                             Glide.with(linkedActivity)
                                     .using(new FirebaseImageLoader())
                                     .load(storageReference)
+                                    .skipMemoryCache(true)
+                                    .diskCacheStrategy(DiskCacheStrategy.NONE)
                                     .into(profileImg);
                         } else{
                             edtName.setText("");
                             edtAddress.setText("");
                             edtPhone.setText("");
                             edtBio.setText("");
-                            tvInterests.setText("");
+//                            tvInterests.setText("");
                         }
                     }
 
@@ -383,10 +381,14 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         new_user.phone = edtPhone.getText().toString();
         new_user.address = edtAddress.getText().toString();
         new_user.userBio = edtBio.getText().toString();
-        new_user.interests = tvInterests.getText().toString();
+//        new_user.interests = tvInterests.getText().toString();
 
         DatabaseReference userProfileFirebaseDatabaseReference = mFirebaseDatabase.child("users").child(uid);
         userProfileFirebaseDatabaseReference.setValue(new_user);
+
+        if (profileBitmap != null) {
+            uploadImage(profileBitmap);
+        }
 
         Toast.makeText(linkedActivity.getApplicationContext(),"Profile updated successfully", Toast.LENGTH_LONG).show();
     }
