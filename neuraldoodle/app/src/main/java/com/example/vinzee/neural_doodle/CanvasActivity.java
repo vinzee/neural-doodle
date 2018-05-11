@@ -416,7 +416,7 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
                 break;
 
             case R.id.magic_btn:
-                VolleyMultipartRequest multipartRequest = new VolleyMultipartRequest(Request.Method.POST, BASE_URL + "?style=" +  style, new Response.Listener<NetworkResponse>() {
+                VolleyMultipartRequest multipartRequest = new VolleyMultipartRequest(Request.Method.POST, BASE_URL + "?style=" +  style.toLowerCase(), new Response.Listener<NetworkResponse>() {
                     @Override
                     public void onResponse(NetworkResponse response) {
                         String resultResponse = new String(response.data);

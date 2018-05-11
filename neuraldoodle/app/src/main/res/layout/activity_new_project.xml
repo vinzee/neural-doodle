@@ -51,28 +51,50 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="15dp"
+                        android:gravity="center"
+                        android:layout_weight="1"
+                        android:text="Renoir" />
+
                     <RadioButton
                         android:id="@+id/renoir"
                         android:layout_width="wrap_content"
                         android:layout_height="250dp"
-                        android:layout_marginTop="15dp"
                         android:text="Renoir"
                         android:drawableLeft="@drawable/renoir"
+                        android:checked="true"
                         />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="15dp"
+                        android:gravity="center"
+                        android:layout_weight="1"
+                        android:text="Monet" />
 
                     <RadioButton
                         android:id="@+id/monet"
                         android:layout_width="wrap_content"
                         android:layout_height="250dp"
-                        android:layout_marginTop="15dp"
                         android:drawableLeft="@drawable/monet"
                         android:text="Monet" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="15dp"
+                        android:gravity="center"
+                        android:layout_weight="1"
+                        android:text="Gogh" />
 
                     <RadioButton
                         android:id="@+id/gogh"
                         android:layout_width="wrap_content"
                         android:layout_height="250dp"
-                        android:layout_marginTop="15dp"
                         android:drawableLeft="@drawable/gogh"
                         android:text="Gogh" />
 

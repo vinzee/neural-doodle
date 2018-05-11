@@ -2,7 +2,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:gravity="center_horizontal"
+    android:gravity="center"
     android:paddingBottom="10dp"
     android:paddingLeft="10dp"
     android:paddingRight="10dp"
@@ -28,33 +28,29 @@
         android:id="@+id/artistName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:text="Artist Name"
+        android:layout_marginTop="10dip"
+        android:text="- by Artist Name"
+        android:textStyle="italic"
         android:textSize="17dp"
         />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:text="Liked this sketch?" />
-
     <Button
-        android:id="@+id/contactArtist"
-        android:layout_width="wrap_content"
+        android:id="@+id/saveSketch"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Contact Artist"
-        android:background="@color/colorAccent"
-        android:padding="4dp"
+        android:layout_marginTop="20dip"
+        android:text="Save Sketch"
+        android:textAllCaps="false"
+        android:textColor="@color/colorPrimary"
         android:textSize="14dip" />
 
     <Button
-        android:id="@+id/saveSketch"
-        android:layout_width="wrap_content"
+        android:id="@+id/contactArtist"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Save Sketch"
-        android:background="@color/colorAccent"
-        android:layout_marginTop="10dip"
-        android:textSize="10dp" />
+        android:text="Contact Artist"
+        android:textAllCaps="false"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="14dip" />
 
 </LinearLayout>

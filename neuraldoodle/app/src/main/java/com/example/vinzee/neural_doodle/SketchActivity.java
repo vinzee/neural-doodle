@@ -42,7 +42,7 @@ public class SketchActivity extends AppCompatActivity implements View.OnClickLis
         projectId = b.getString("projectId");
 
         artistNameText = findViewById(R.id.artistName);
-        artistNameText.setText(style);
+        artistNameText.setText("- by " + style);
 
         queue = Volley.newRequestQueue(this);
 
@@ -58,6 +58,8 @@ public class SketchActivity extends AppCompatActivity implements View.OnClickLis
         });
 
         networkImageView = findViewById(R.id.networkImageView);
+        networkImageView.setDrawingCacheEnabled(true);
+        networkImageView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
 
         progressBar = findViewById(R.id.progressBar);
         progressBar.setVisibility(View.VISIBLE);
@@ -66,13 +68,15 @@ public class SketchActivity extends AppCompatActivity implements View.OnClickLis
         saveSketchButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                String imgURL = MediaStore.Images.Media.insertImage( getContentResolver(), networkImageView.getDrawingCache(), UUID.randomUUID().toString() + ".png", "drawing");
+                String imgURL = MediaStore.Images.Media.insertImage( getContentResolver(), networkImageView.getDrawingCache(), UUID.randomUUID().toString() + ".png", "sketch");
 
                 if (imgURL != null) {
                     Toast.makeText(getApplicationContext(), "Drawing saved to Gallery: " + imgURL, Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(getApplicationContext(), "Oops! Image could not be saved.", Toast.LENGTH_SHORT).show();
                 }
+
+                networkImageView.destroyDrawingCache();
             }
         });
     }
