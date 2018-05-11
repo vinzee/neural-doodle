@@ -1,13 +1,13 @@
 package com.example.vinzee.neural_doodle;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
@@ -15,7 +15,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-public class NewSketchProjectActivity extends AppCompatActivity implements View.OnClickListener {
+public class NewProjectActivity extends AppCompatActivity implements View.OnClickListener {
 
     private FirebaseAuth auth;
     private StorageReference mStorageRef;
@@ -24,6 +24,7 @@ public class NewSketchProjectActivity extends AppCompatActivity implements View.
     private FirebaseDatabase mFirebaseInstance;
     private EditText projectNameText;
     private Button beginButton;
+    private RadioGroup styleRadioGroup;
     private RadioButton renoir;
     private RadioButton monet;
     private RadioButton gogh;
@@ -31,11 +32,12 @@ public class NewSketchProjectActivity extends AppCompatActivity implements View.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_new_sketch_project);
+        setContentView(R.layout.activity_new_project);
 
         projectNameText = findViewById(R.id.project_name);
         beginButton = findViewById(R.id.create_project_button);
         beginButton.setOnClickListener(this);
+        styleRadioGroup = findViewById(R.id.styleRadioGroup);
         renoir = findViewById(R.id.renoir);
         monet = findViewById(R.id.monet);
         gogh = findViewById(R.id.gogh);
@@ -44,26 +46,20 @@ public class NewSketchProjectActivity extends AppCompatActivity implements View.
         mStorageRef = FirebaseStorage.getInstance().getReference();
         mFirebaseInstance = FirebaseDatabase.getInstance();
         mFirebaseDatabase = mFirebaseInstance.getReference("projects");
+
     }
 
     @Override
     public void onClick(View v) {
-        Log.d("New Project", "Clicked!!");
         String userId = auth.getCurrentUser().getUid();
         String projectKey = mFirebaseDatabase.child(userId).push().getKey();
-        mFirebaseDatabase.child(userId).child(projectKey).
-                child("project-name").setValue(projectNameText.getText().toString());
-        String style = "renoir";
-        if(renoir.isChecked()){
-            style = "renoir";
-        } else if (monet.isChecked()){
-            style = "monet";
-        } else if (gogh.isChecked()){
-            style = "gogh";
-        }
 
+        String style = ((RadioButton)findViewById(styleRadioGroup.getCheckedRadioButtonId())).getText().toString();
+
+        mFirebaseDatabase.child(userId).child(projectKey).child("project-name").setValue(projectNameText.getText().toString());
         mFirebaseDatabase.child(userId).child(projectKey).child("style").setValue(style);
-        Intent intent = new Intent(NewSketchProjectActivity.this, CanvasActivity.class);
+
+        Intent intent = new Intent(NewProjectActivity.this, CanvasActivity.class);
         intent.putExtra("projectId", projectKey);
         intent.putExtra("projectName", projectNameText.getText().toString());
         intent.putExtra("userId", userId);

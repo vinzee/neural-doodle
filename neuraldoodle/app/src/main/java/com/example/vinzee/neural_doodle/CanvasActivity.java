@@ -36,8 +36,6 @@ import com.android.volley.toolbox.Volley;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -62,7 +60,7 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
     private final String BASE_URL = "http://43a87bf7.ngrok.io";
     private FirebaseAuth auth;
     private StorageReference mStorageRef;
-    User user=new User();
+    User user = new User();
     private String projectName;
     private String projectId;
     private String userId;
@@ -426,7 +424,8 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
                         Log.i("resultResponse: ", imageURL);
 
                         Intent myIntent = new Intent(CanvasActivity.this, SketchActivity.class);
-                        myIntent.putExtra("imageURL", imageURL); //Optional parameters
+                        myIntent.putExtra("imageURL", imageURL);
+                        myIntent.putExtra("style", style);
                         CanvasActivity.this.startActivity(myIntent);
                     }
                 }, new Response.ErrorListener() {
@@ -453,11 +452,11 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
                                 if (networkResponse.statusCode == 404) {
                                     errorMessage = "Resource not found";
                                 } else if (networkResponse.statusCode == 401) {
-                                    errorMessage = message+" Please login again";
+                                    errorMessage = message + " Please login again";
                                 } else if (networkResponse.statusCode == 400) {
-                                    errorMessage = message+ " Check your inputs";
+                                    errorMessage = message + " Check your inputs";
                                 } else if (networkResponse.statusCode == 500) {
-                                    errorMessage = message+" Something is getting wrong";
+                                    errorMessage = message +" Something is getting wrong";
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();

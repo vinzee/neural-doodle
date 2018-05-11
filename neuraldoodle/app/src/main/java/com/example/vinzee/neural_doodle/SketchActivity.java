@@ -7,6 +7,7 @@ import android.support.v4.util.LruCache;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
@@ -19,9 +20,10 @@ public class SketchActivity extends AppCompatActivity {
     private ImageLoader imageLoader;
     private ProgressBar progressBar;
     private Handler handler = new Handler();
-    private String imageURL;
+    private String imageURL, style = "";
     private int handlerCount = 0;
     private static final int handlerCountThreshold = 15;
+    private TextView artistNameText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +32,10 @@ public class SketchActivity extends AppCompatActivity {
 
         Bundle b = getIntent().getExtras();
         imageURL = b.getString("imageURL");
+        style = b.getString("style");
+
+        artistNameText = findViewById(R.id.artistName);
+        artistNameText.setText(style);
 
         queue = Volley.newRequestQueue(this);
 
@@ -53,7 +59,7 @@ public class SketchActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        handler.postDelayed(runnable, 1000*5);
+        handler.postDelayed(runnable, 1000*20);
     }
 
     @Override
