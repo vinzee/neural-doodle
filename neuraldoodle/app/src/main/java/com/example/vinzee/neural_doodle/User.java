@@ -21,4 +21,17 @@ public class User {
         this.userBio = userBio;
         this.interests = interests;
     }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", phone='" + phone + '\'' +
+                ", address='" + address + '\'' +
+                ", userType='" + userType + '\'' +
+                ", userBio='" + userBio + '\'' +
+                ", interests='" + interests + '\'' +
+                '}';
+    }
 }
