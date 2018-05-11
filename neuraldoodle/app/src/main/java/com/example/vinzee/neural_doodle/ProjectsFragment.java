@@ -14,8 +14,6 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -63,12 +61,12 @@ public class ProjectsFragment extends Fragment {
         mFirebaseDatabase.addListenerForSingleValueEvent( new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                mStorageRef = FirebaseStorage.getInstance().getReference();
-                StorageReference storageReference = mStorageRef.child("images/"+tempUserId+"_profile.jpg");
-                Glide.with(linkedActivity)
-                        .using(new FirebaseImageLoader())
-                        .load(storageReference)
-                        .into(profileImg);
+//                mStorageRef = FirebaseStorage.getInstance().getReference();
+//                StorageReference storageReference = mStorageRef.child("images/"+tempUserId+"_profile.jpg");
+//                Glide.with(linkedActivity)
+//                        .using(new FirebaseImageLoader())
+//                        .load(storageReference)
+//                        .into(profileImg);
 
                 Log.d("dataSnapshot: ", dataSnapshot.toString());
             }
