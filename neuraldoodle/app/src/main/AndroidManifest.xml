@@ -20,7 +20,11 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".HomeActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"/>
+
+        <activity android:name=".ResetPasswordActivity"
+            android:screenOrientation="portrait"/>
+
         <activity
             android:name=".SignupActivity"
             android:screenOrientation="portrait"
@@ -34,10 +38,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".SketchActivity" />
+        <activity
+            android:name=".SketchActivity"></activity>
         <activity
             android:name=".NewProjectActivity"
-            android:windowSoftInputMode="stateHidden" />
+            android:windowSoftInputMode="stateHidden"></activity>
+        <activity
+            android:name=".UpdateUserProfileActivity"
+            android:windowSoftInputMode="stateHidden"></activity>
     </application>
 
 </manifest>
