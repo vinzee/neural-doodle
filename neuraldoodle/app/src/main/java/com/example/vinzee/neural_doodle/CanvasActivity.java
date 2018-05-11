@@ -371,14 +371,15 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
                     public void onClick(DialogInterface dialog, int which) {
 
                         //attempt to save
+
                         String imgURL = MediaStore.Images.Media.insertImage(
                                 getContentResolver(), drawView.getDrawingCache(),
                                 UUID.randomUUID().toString() + ".png", "drawing");
-                        // feedback
+
                         if (imgURL != null) {
                             Toast.makeText(getApplicationContext(),
                                     "Drawing saved to Gallery: " + imgURL, Toast.LENGTH_SHORT).show();
-                            // TODO - Save to DB
+
                             ByteArrayOutputStream baos = new ByteArrayOutputStream();
                             drawView.getDrawingCache().compress(Bitmap.CompressFormat.JPEG,80,baos);
                             byte[] data= baos.toByteArray();
@@ -400,9 +401,9 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
                                 }
                             });
                         } else {
-                            Toast.makeText(getApplicationContext(),
-                                    "Oops! Image could not be saved.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), "Oops! Image could not be saved.", Toast.LENGTH_SHORT).show();
                         }
+
                         drawView.destroyDrawingCache();
                     }
                 });
@@ -426,6 +427,7 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
                         Intent myIntent = new Intent(CanvasActivity.this, SketchActivity.class);
                         myIntent.putExtra("imageURL", imageURL);
                         myIntent.putExtra("style", style);
+                        myIntent.putExtra("projectId", projectId);
                         CanvasActivity.this.startActivity(myIntent);
                     }
                 }, new Response.ErrorListener() {
@@ -478,6 +480,7 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
                         Map<String, DataPart> params = new HashMap<>();
                         // file name could found file base or direct access from real path
                         // for now just get bitmap data from ImageView
+                        drawView.destroyDrawingCache();
 
                         params.put("file", new DataPart("test.png", getFileDataFromDrawable(drawView.getDrawingCache()), "image/png"));
 
