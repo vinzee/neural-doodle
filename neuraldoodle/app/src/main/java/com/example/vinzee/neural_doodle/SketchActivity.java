@@ -71,7 +71,7 @@ public class SketchActivity extends AppCompatActivity implements View.OnClickLis
                 String imgURL = MediaStore.Images.Media.insertImage( getContentResolver(), networkImageView.getDrawingCache(), UUID.randomUUID().toString() + ".png", "sketch");
 
                 if (imgURL != null) {
-                    Toast.makeText(getApplicationContext(), "Drawing saved to Gallery: " + imgURL, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Drawing saved to Gallery.", Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(getApplicationContext(), "Oops! Image could not be saved.", Toast.LENGTH_SHORT).show();
                 }
