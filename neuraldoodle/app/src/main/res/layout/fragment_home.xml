@@ -5,10 +5,20 @@
     android:layout_height="match_parent"
     tools:context=".ProjectFragment">
 
-    <!-- TODO: Update blank fragment layout -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="Home" />
+        android:text="Projects"
+        android:textSize="25dip"
+        android:textStyle="bold"
+        />
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:src="@mipmap/app_icon"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="50dp"/>
 </FrameLayout>
