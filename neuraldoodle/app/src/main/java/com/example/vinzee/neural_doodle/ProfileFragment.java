@@ -1,7 +1,6 @@
 package com.example.vinzee.neural_doodle;
 
 
-import android.*;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -16,30 +15,21 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
-import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -53,8 +43,6 @@ import com.google.firebase.storage.UploadTask;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
-
-import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -79,7 +67,20 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private ImageView profileImg;
     private View profileView;
     private Activity linkedActivity;
-    User user;
+    private User user;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        auth = FirebaseAuth.getInstance();
+        user = new User();
+        mStorageRef = FirebaseStorage.getInstance().getReference();
+        mFirebaseInstance = FirebaseDatabase.getInstance();
+        mFirebaseDatabase = mFirebaseInstance.getReference();
+        uid = auth.getCurrentUser().getUid();
+        linkedActivity = getActivity();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -103,8 +104,8 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         btnSelectInterest.setOnClickListener(this);
         btnUpload = (Button) profileView.findViewById(R.id.update_button);
         btnUpload.setOnClickListener(this);
-        edtPhone.addTextChangedListener(new TextWatcher() {
 
+        edtPhone.addTextChangedListener(new TextWatcher() {
             int length_before = 0;
 
             @Override
@@ -133,22 +134,10 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 }
             }
         });
-        getProfileDetails();
-        return profileView;
-    }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        //getSupportActionBar().setTitle("Imagination Station");
-        //Get Firebase auth instance
-        auth = FirebaseAuth.getInstance();
-        user = new User();
-        mStorageRef = FirebaseStorage.getInstance().getReference();
-        mFirebaseInstance = FirebaseDatabase.getInstance();
-        mFirebaseDatabase = mFirebaseInstance.getReference();
-        uid = auth.getCurrentUser().getUid();
-        linkedActivity = getActivity();
+        getProfileDetails();
+
+        return profileView;
     }
 
     @Override
@@ -198,26 +187,25 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             }
 
         })
-                // Set the action buttons
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        String selectedIndex = "";
-                        for(Integer i : selectedItems){
-                            selectedIndex += i + ", ";
-                            interests.append(dialogList[i]+"; ");
-                            tvInterests.setText(interests.toString());
-                        }
-                    }
-                })
-
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        // removes the AlertDialog in the screen
-                    }
-                })
-                .show();
+        // Set the action buttons
+        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+                String selectedIndex = "";
+                for(Integer i : selectedItems){
+                    selectedIndex += i + ", ";
+                    interests.append(dialogList[i]+"; ");
+                    tvInterests.setText(interests.toString());
+                }
+            }
+        })
+        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+                // removes the AlertDialog in the screen
+            }
+        })
+        .show();
     }
 
     public void loadImageFromStorage()  {
@@ -344,6 +332,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
     private void getProfileDetails() {
         final String tempUserId = uid;
+
         mFirebaseDatabase.child("users").child(uid).addListenerForSingleValueEvent(
                 new ValueEventListener() {
                     @Override
@@ -406,15 +395,16 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     }
 
     private void updateUser() {
+        User new_user = new User();
 
-        user.name = edtName.getText().toString();
-        user.phone = edtPhone.getText().toString();
-        user.address = edtAddress.getText().toString();
-        user.userBio = edtBio.getText().toString();
-        user.interests = tvInterests.getText().toString();
+        new_user.name = edtName.getText().toString();
+        new_user.phone = edtPhone.getText().toString();
+        new_user.address = edtAddress.getText().toString();
+        new_user.userBio = edtBio.getText().toString();
+        new_user.interests = tvInterests.getText().toString();
 
         DatabaseReference userProfileFirebaseDatabaseReference = mFirebaseDatabase.child("users").child(uid);
-        userProfileFirebaseDatabaseReference.setValue(user);
+        userProfileFirebaseDatabaseReference.setValue(new_user);
 
         if (profileBitmap != null) {
             uploadImage(profileBitmap);

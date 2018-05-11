@@ -7,18 +7,12 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.StorageReference;
 
 public class HomeActivity extends AppCompatActivity {
@@ -52,32 +46,12 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //getSupportActionBar().setTitle("Imagination Station");
-
 
         setContentView(R.layout.activity_home);
         pushFragment(new ProjectFragment());
-        //get firebase auth instance
         auth = FirebaseAuth.getInstance();
 
-        getUserData();
-        //get current user
-        //final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-
-
-        authListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user == null) {
-                    // user auth state is changed - user is null launch login activity
-                    startActivity(new Intent(HomeActivity.this, LoginActivity.class));
-                    finish();
-                }
-            }
-        };
-
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
     }
 
@@ -94,7 +68,8 @@ public class HomeActivity extends AppCompatActivity {
                 startActivity(intent);
                 return true;
 
-            case R.id.logout:auth.signOut();
+            case R.id.logout:
+                auth.signOut();
                 Intent loginIntent = new Intent(HomeActivity.this, LoginActivity.class);
                 startActivity(loginIntent);
                 finish();
@@ -132,7 +107,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void pushFragment(ProfileFragment profileFragment){
-        if(profileFragment==null)    {
+        if(profileFragment == null)    {
             return;
         }
 
@@ -144,48 +119,4 @@ public class HomeActivity extends AppCompatActivity {
             transaction.commit();
         }
     }
-    User user=new User();
-    private void getUserData()  {
-        String uid= auth.getCurrentUser().getUid();
-
-        mFirebaseInstance = FirebaseDatabase.getInstance();
-        mFirebaseDatabase = mFirebaseInstance.getReference("users");
-        mFirebaseInstance.getReference("app_title").setValue("Imagination Station");
-        // app_title change listener
-        mFirebaseInstance.getReference("app_title").addValueEventListener(new ValueEventListener() {
-
-
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.e(TAG, "App title updated");
-
-                String appTitle = dataSnapshot.getValue(String.class);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError error) {
-                // Failed to read value
-                Log.e(TAG, "Failed to read app title value.", error.toException());
-            }
-        });
-
-        //DatabaseReference databaseReference = mFirebaseDatabase.child(uid);
-        mFirebaseDatabase.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for(DataSnapshot singleSnapshot : dataSnapshot.getChildren()){
-                    user = singleSnapshot.getValue(User.class);
-                    Toast.makeText(HomeActivity.this," "+user.email+" "+user.name+" " ,Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
-
-    }
-
 }
