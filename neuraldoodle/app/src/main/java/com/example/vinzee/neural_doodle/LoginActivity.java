@@ -68,6 +68,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void attemptLogin(){
+        progressBar.setVisibility(View.VISIBLE);
         String email = inputEmail.getText().toString();
         final String password = inputPassword.getText().toString();
 
@@ -102,6 +103,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                             Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
                             startActivity(intent);
                             finish();
+                            progressBar.setVisibility(View.GONE);
                         }
                     }
                 });

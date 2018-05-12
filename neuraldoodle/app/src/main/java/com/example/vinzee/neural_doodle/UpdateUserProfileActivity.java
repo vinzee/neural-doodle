@@ -30,10 +30,8 @@ public class UpdateUserProfileActivity extends AppCompatActivity implements View
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_update_user_profile);
-        //getSupportActionBar().setTitle("Imagination Station");
+
         initUI();
-
-
     }
 
     private void initUI()   {
@@ -45,6 +43,7 @@ public class UpdateUserProfileActivity extends AppCompatActivity implements View
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
+
                 if (user == null) {
                     // user auth state is changed - user is null
                     // launch login activity

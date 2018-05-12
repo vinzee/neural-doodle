@@ -107,6 +107,7 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
         drawView.setDrawingCacheEnabled(true);
         drawView.setDrawingCacheBackgroundColor(0xfffafafa);
         drawView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+        drawView.setColor("#FFFF0000");
 
 
         //erase button
