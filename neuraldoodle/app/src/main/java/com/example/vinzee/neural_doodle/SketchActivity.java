@@ -4,10 +4,12 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.util.LruCache;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.Button;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,13 +29,15 @@ public class SketchActivity extends AppCompatActivity implements View.OnClickLis
     private Handler handler = new Handler();
     private String imageURL, style, projectId;
     private int handlerCount = 0;
-    private static final int handlerCountThreshold = 15;
+    private static final int handlerCountThreshold = 6;
     private TextView artistNameText;
-    private Button saveSketchButton;
+    private FloatingActionButton saveSketchButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_sketch_view);
 
         Bundle b = getIntent().getExtras();
@@ -42,7 +46,7 @@ public class SketchActivity extends AppCompatActivity implements View.OnClickLis
         projectId = b.getString("projectId");
 
         artistNameText = findViewById(R.id.artistName);
-        artistNameText.setText("- by " + style);
+        artistNameText.setText("- " + style);
 
         queue = Volley.newRequestQueue(this);
 
@@ -100,7 +104,7 @@ public class SketchActivity extends AppCompatActivity implements View.OnClickLis
             progressBar.setVisibility(View.GONE);
 
             if (handlerCount++ < handlerCountThreshold) {
-                handler.postDelayed(this, 1000*5);
+                handler.postDelayed(this, 1000*10);
             }
         }
     };
