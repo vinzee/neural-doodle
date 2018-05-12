@@ -78,7 +78,7 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
         Intent intent = getIntent();
         projectId = intent.getStringExtra("projectId");
         userId = intent.getStringExtra("userId");
-        projectName = intent.getStringExtra("projectName");
+        projectName = intent.getStringExtra("name");
         style = intent.getStringExtra("style");
         queue = Volley.newRequestQueue(this);
 

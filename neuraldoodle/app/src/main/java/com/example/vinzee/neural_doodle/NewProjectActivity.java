@@ -60,7 +60,7 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
 
         Intent intent = new Intent(NewProjectActivity.this, CanvasActivity.class);
         intent.putExtra("projectId", projectKey);
-        intent.putExtra("projectName", projectNameText.getText().toString());
+        intent.putExtra("name", projectNameText.getText().toString());
         intent.putExtra("userId", userId);
         intent.putExtra("style", style);
         startActivity(intent);

@@ -4,43 +4,35 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
-import android.widget.TextView;
-
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+
+import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class ProjectsFragment extends Fragment {
     private static final String TAG = SignupActivity.class.getSimpleName();
-    private EditText edtName,edtAddress,edtPhone,edtBio;
-    private Button btnUpload, btnSelectInterest , btnSelectArt;
-    private TextView tvInterests,tvArtistArt;
-    private LinearLayout artistExt;
     private String uid;
-
-    private ProgressBar progressBar;
     private FirebaseAuth auth;
-    private StorageReference mStorageRef;
 
     private DatabaseReference mFirebaseDatabase;
     private FirebaseDatabase mFirebaseInstance;
     private View view;
+    private StorageReference mStorageRef;
+    private View progressBar;
 
     public ProjectsFragment() {
         // Required empty public constructor
@@ -53,22 +45,29 @@ public class ProjectsFragment extends Fragment {
         auth = FirebaseAuth.getInstance();
         uid = auth.getCurrentUser().getUid();
 
-        mStorageRef = FirebaseStorage.getInstance().getReference();
         mFirebaseInstance = FirebaseDatabase.getInstance();
         Log.d("uid: ", uid);
         mFirebaseDatabase = mFirebaseInstance.getReference("projects").child(uid);
 
-        mFirebaseDatabase.addListenerForSingleValueEvent( new ValueEventListener() {
+        mFirebaseDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-//                mStorageRef = FirebaseStorage.getInstance().getReference();
-//                StorageReference storageReference = mStorageRef.child("images/"+tempUserId+"_profile.jpg");
-//                Glide.with(linkedActivity)
-//                        .using(new FirebaseImageLoader())
-//                        .load(storageReference)
-//                        .into(profileImg);
+                ArrayList<Project> projectList = new ArrayList<>();
 
-                Log.d("dataSnapshot: ", dataSnapshot.toString());
+                for (DataSnapshot projectSnapshot: dataSnapshot.getChildren()) {
+                    Project project = projectSnapshot.getValue(Project.class);
+                    project.name = projectSnapshot.child("project-name").getValue().toString();
+                    project.id = projectSnapshot.getKey();
+                    projectList.add(project);
+                }
+
+                RecyclerViewAdapter adapter = new RecyclerViewAdapter(projectList);
+                RecyclerView myView =  (RecyclerView) view.findViewById(R.id.recyclerview);
+                myView.setHasFixedSize(true);
+                myView.setAdapter(adapter);
+                LinearLayoutManager llm = new LinearLayoutManager(getActivity());
+                llm.setOrientation(LinearLayoutManager.VERTICAL);
+                myView.setLayoutManager(llm);
             }
 
             @Override
@@ -97,5 +96,4 @@ public class ProjectsFragment extends Fragment {
 
         return view;
     }
-
 }
