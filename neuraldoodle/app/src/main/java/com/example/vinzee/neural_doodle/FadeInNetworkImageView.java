@@ -13,7 +13,7 @@ import com.android.volley.toolbox.NetworkImageView;
 
 public class FadeInNetworkImageView extends NetworkImageView {
 
-    private static final int FADE_IN_TIME_MS = 150;
+    private static final int FADE_IN_TIME_MS = 1000;
 
     private static ColorDrawable cd = new ColorDrawable(Color.parseColor("#00ff0000"));
 

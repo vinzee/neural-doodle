@@ -25,7 +25,6 @@
                     android:layout_height="@dimen/user_w_h"
                     android:layout_gravity="center_horizontal"
                     android:src="@mipmap/user"
-                    android:layout_marginBottom="20dp"
                     android:id="@+id/profile_image"/>
                 <!---->
             </android.support.design.widget.TextInputLayout>
@@ -95,6 +94,7 @@
                     android:textColor="@color/colorAccent" />
             </android.support.design.widget.TextInputLayout>
 
+            <!--
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
@@ -127,6 +127,7 @@
                 </LinearLayout>
 
             </android.support.design.widget.TextInputLayout>
+            -->
 
             <Button
                 android:id="@+id/update_button"

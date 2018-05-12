@@ -60,6 +60,7 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
     private float smallBrush, mediumBrush, largeBrush;
     private RequestQueue queue;
     private final String BASE_URL = "http://43a87bf7.ngrok.io";
+    private static final int MAX_IMAGE_SIZE = 600;
     private FirebaseAuth auth;
     private StorageReference mStorageRef;
     User user = new User();
@@ -387,7 +388,9 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
                                     "Drawing saved to Gallery: " + imgURL, Toast.LENGTH_SHORT).show();
 
                             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                            drawView.getDrawingCache().compress(Bitmap.CompressFormat.JPEG,80,baos);
+                            Bitmap scaledBitmap = scaleDown(drawView.getDrawingCache(), MAX_IMAGE_SIZE, true);
+                            // drawView.getDrawingCache().compress(Bitmap.CompressFormat.JPEG,80,baos);
+                            scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 0 ,baos);
                             byte[] data= baos.toByteArray();
 
                             StorageReference storageReference =
@@ -488,7 +491,7 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
                         // for now just get bitmap data from ImageView
                         drawView.destroyDrawingCache();
 
-                        params.put("file", new DataPart("test.png", getFileDataFromDrawable(drawView.getDrawingCache()), "image/png"));
+                        params.put("file", new DataPart("test.png", getFileDataFromDrawable(scaleDown(drawView.getDrawingCache(), MAX_IMAGE_SIZE, true)), "image/png"));
 
                         return params;
                     }
@@ -532,5 +535,21 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
             // other 'case' lines to check for other
             // permissions this app might request.
         }
+    }
+
+    public static Bitmap scaleDown(Bitmap realImage, float maxImageSize,
+                                   boolean filter) {
+//        Log.d("Pre-resize Width", String.valueOf(realImage.getWidth()));
+//        Log.d("Pre-resize Height", String.valueOf(realImage.getHeight()));
+        float ratio = Math.min(
+                maxImageSize / realImage.getWidth(),
+                maxImageSize / realImage.getHeight());
+        int width = Math.round(ratio * realImage.getWidth());
+        int height = Math.round(ratio * realImage.getHeight());
+
+//        Log.d("Pre-resize Width", String.valueOf(width));
+//        Log.d("Pre-resize Height", String.valueOf(height));
+
+        return Bitmap.createScaledBitmap(realImage, width, height, filter);
     }
 }
