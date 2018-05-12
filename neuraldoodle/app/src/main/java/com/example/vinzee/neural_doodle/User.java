@@ -1,6 +1,9 @@
 package com.example.vinzee.neural_doodle;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable {
+    public String uID;
     public String name;
     public String email;
     public String phone;
@@ -12,7 +15,8 @@ public class User {
     public User(){
     }
 
-    public User(String name, String email, String phone, String address, String userType, String userBio, String interests) {
+    public User( String name, String email, String phone, String address, String userType, String userBio, String interests) {
+
         this.name = name;
         this.email = email;
         this.phone = phone;
