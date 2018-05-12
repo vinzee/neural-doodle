@@ -4,8 +4,10 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.v4.util.LruCache;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
@@ -16,7 +18,14 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
 import java.util.UUID;
 
 public class SketchActivity extends AppCompatActivity implements View.OnClickListener {
@@ -27,9 +36,11 @@ public class SketchActivity extends AppCompatActivity implements View.OnClickLis
     private Handler handler = new Handler();
     private String imageURL, style, projectId;
     private int handlerCount = 0;
-    private static final int handlerCountThreshold = 15;
+    private static final int handlerCountThreshold = 2;
     private TextView artistNameText;
     private Button saveSketchButton;
+    private FirebaseAuth auth;
+    private StorageReference mStorageRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +56,7 @@ public class SketchActivity extends AppCompatActivity implements View.OnClickLis
         artistNameText.setText("- by " + style);
 
         queue = Volley.newRequestQueue(this);
+        mStorageRef = FirebaseStorage.getInstance().getReference();
 
         imageLoader = new ImageLoader(queue, new ImageLoader.ImageCache() {
             private final LruCache<String, Bitmap> mCache = new LruCache<>(10);
@@ -69,7 +81,25 @@ public class SketchActivity extends AppCompatActivity implements View.OnClickLis
             @Override
             public void onClick(View v) {
                 String imgURL = MediaStore.Images.Media.insertImage( getContentResolver(), networkImageView.getDrawingCache(), UUID.randomUUID().toString() + ".png", "sketch");
-
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                // drawView.getDrawingCache().compress(Bitmap.CompressFormat.JPEG,80,baos);
+                networkImageView.getDrawingCache().compress(Bitmap.CompressFormat.JPEG, 0 ,baos);
+                byte[] data= baos.toByteArray();
+                StorageReference storageReference = mStorageRef.child("images/"+projectId+"_sketch.png");
+                Log.d("Upload path", "images/"+projectId+"_sketch.png");
+                UploadTask uploadTask = storageReference.putBytes(data);
+                uploadTask.addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        // Handle unsuccessful uploads
+                        Toast.makeText(getApplicationContext(),"image upload failed ",Toast.LENGTH_LONG).show();
+                    }
+                }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        Log.d("Sketch Upload", "Success!!");
+                    }
+                });
                 if (imgURL != null) {
                     Toast.makeText(getApplicationContext(), "Drawing saved to Gallery.", Toast.LENGTH_SHORT).show();
                 } else {
@@ -84,7 +114,9 @@ public class SketchActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     protected void onResume() {
         super.onResume();
-        handler.postDelayed(runnable, 1000*20);
+        if (handlerCount++ < handlerCountThreshold) {
+            handler.postDelayed(runnable, 1000 * 2);
+        }
     }
 
     @Override
@@ -100,7 +132,7 @@ public class SketchActivity extends AppCompatActivity implements View.OnClickLis
             progressBar.setVisibility(View.GONE);
 
             if (handlerCount++ < handlerCountThreshold) {
-                handler.postDelayed(this, 1000*5);
+                handler.postDelayed(this, 1000*10);
             }
         }
     };
