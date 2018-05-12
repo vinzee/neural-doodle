@@ -16,6 +16,14 @@
             android:scaleType="fitXY"
             android:gravity="center"
             />
+        <com.example.vinzee.neural_doodle.FadeInNetworkImageView
+            android:id="@+id/backImageView"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:adjustViewBounds="true"
+            android:scaleType="fitXY"
+            android:gravity="center"
+            />
 
         <ProgressBar
             android:id="@+id/progressBar"

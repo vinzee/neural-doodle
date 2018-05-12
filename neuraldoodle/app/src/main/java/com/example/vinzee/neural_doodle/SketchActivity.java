@@ -22,7 +22,6 @@ import com.android.volley.toolbox.NetworkImageView;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -36,12 +35,14 @@ public class SketchActivity extends AppCompatActivity implements View.OnClickLis
     private ImageLoader imageLoader;
     private ProgressBar progressBar;
     private Handler handler = new Handler();
+    private Handler handler2 = new Handler();
     private String imageURL, style, projectId;
     private int handlerCount = 0;
     private static final int handlerCountThreshold = 6;
     private TextView artistNameText;
     private FloatingActionButton saveSketchButton;
     private StorageReference mStorageRef;
+    private NetworkImageView backImgView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +73,7 @@ public class SketchActivity extends AppCompatActivity implements View.OnClickLis
             }
         });
 
+        backImgView = findViewById(R.id.backImageView);
         networkImageView = findViewById(R.id.networkImageView);
         networkImageView.setDrawingCacheEnabled(true);
         networkImageView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
@@ -118,7 +120,8 @@ public class SketchActivity extends AppCompatActivity implements View.OnClickLis
     protected void onResume() {
         super.onResume();
         if (handlerCount++ < handlerCountThreshold) {
-            handler.postDelayed(runnable, 1000 * 2);
+            handler.postDelayed(runnable, 1000 * 1);
+            handler2.postDelayed(runnable2, 1000 * 3);
         }
     }
 
@@ -126,16 +129,32 @@ public class SketchActivity extends AppCompatActivity implements View.OnClickLis
     protected void onPause() {
         super.onPause();
         handler.removeCallbacks(runnable);
+        handler2.removeCallbacks(runnable2);
     }
 
     private Runnable runnable = new Runnable() {
         @Override
         public void run() {
+            backImgView.setVisibility(View.VISIBLE);
+            networkImageView.setVisibility(View.GONE);
             networkImageView.setImageUrl(imageURL + "/?time=" + System.currentTimeMillis(), imageLoader);
             progressBar.setVisibility(View.GONE);
 
             if (handlerCount++ < handlerCountThreshold) {
                 handler.postDelayed(this, 1000*10);
+            }
+        }
+    };
+
+    private Runnable runnable2 = new Runnable() {
+        @Override
+        public void run() {
+            networkImageView.setVisibility(View.VISIBLE);
+            backImgView.setVisibility(View.GONE);
+            backImgView.setImageUrl(imageURL + "/?time=" + System.currentTimeMillis(), imageLoader);
+
+            if (handlerCount++ < handlerCountThreshold) {
+                handler2.postDelayed(this, 1000*10);
             }
         }
     };
