@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -16,6 +17,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -32,7 +35,12 @@ import com.android.volley.Response;
 import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -52,14 +60,30 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
     private float smallBrush, mediumBrush, largeBrush;
     private RequestQueue queue;
     private final String BASE_URL = "http://43a87bf7.ngrok.io";
+    private static final int MAX_IMAGE_SIZE = 600;
     private FirebaseAuth auth;
+    private StorageReference mStorageRef;
+    User user = new User();
+    private String projectName;
+    private String projectId;
+    private String userId;
+    private String style;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_canvas);
 
+        Intent intent = getIntent();
+        projectId = intent.getStringExtra("projectId");
+        userId = intent.getStringExtra("userId");
+        projectName = intent.getStringExtra("name");
+        style = intent.getStringExtra("style");
         queue = Volley.newRequestQueue(this);
+
+        mStorageRef = FirebaseStorage.getInstance().getReference();
 
         //get drawing view
         drawView = findViewById(R.id.drawing);
@@ -83,6 +107,7 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
         drawView.setDrawingCacheEnabled(true);
         drawView.setDrawingCacheBackgroundColor(0xfffafafa);
         drawView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+        drawView.setColor("#FFFF0000");
 
 
         //erase button
@@ -353,17 +378,41 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
                     public void onClick(DialogInterface dialog, int which) {
 
                         //attempt to save
+
                         String imgURL = MediaStore.Images.Media.insertImage(
                                 getContentResolver(), drawView.getDrawingCache(),
                                 UUID.randomUUID().toString() + ".png", "drawing");
-                        // feedback
+
                         if (imgURL != null) {
                             Toast.makeText(getApplicationContext(),
                                     "Drawing saved to Gallery: " + imgURL, Toast.LENGTH_SHORT).show();
+
+                            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                            Bitmap scaledBitmap = scaleDown(drawView.getDrawingCache(), MAX_IMAGE_SIZE, true);
+                            // drawView.getDrawingCache().compress(Bitmap.CompressFormat.JPEG,80,baos);
+                            scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 0 ,baos);
+                            byte[] data= baos.toByteArray();
+
+                            StorageReference storageReference =
+                                    mStorageRef.child("images/"+projectId+"_project.png");
+
+                            UploadTask uploadTask = storageReference.putBytes(data);
+                            uploadTask.addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception exception) {
+                                    // Handle unsuccessful uploads
+                                    Toast.makeText(getApplicationContext(),"image upload failed ",Toast.LENGTH_LONG).show();
+                                }
+                            }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                @Override
+                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+                                }
+                            });
                         } else {
-                            Toast.makeText(getApplicationContext(),
-                                    "Oops! Image could not be saved.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), "Oops! Image could not be saved.", Toast.LENGTH_SHORT).show();
                         }
+
                         drawView.destroyDrawingCache();
                     }
                 });
@@ -376,7 +425,7 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
                 break;
 
             case R.id.magic_btn:
-                VolleyMultipartRequest multipartRequest = new VolleyMultipartRequest(Request.Method.POST, BASE_URL, new Response.Listener<NetworkResponse>() {
+                VolleyMultipartRequest multipartRequest = new VolleyMultipartRequest(Request.Method.POST, BASE_URL + "?style=" +  style.toLowerCase(), new Response.Listener<NetworkResponse>() {
                     @Override
                     public void onResponse(NetworkResponse response) {
                         String resultResponse = new String(response.data);
@@ -385,7 +434,9 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
                         Log.i("resultResponse: ", imageURL);
 
                         Intent myIntent = new Intent(CanvasActivity.this, SketchActivity.class);
-                        myIntent.putExtra("imageURL", imageURL); //Optional parameters
+                        myIntent.putExtra("imageURL", imageURL);
+                        myIntent.putExtra("style", style);
+                        myIntent.putExtra("projectId", projectId);
                         CanvasActivity.this.startActivity(myIntent);
                     }
                 }, new Response.ErrorListener() {
@@ -412,11 +463,11 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
                                 if (networkResponse.statusCode == 404) {
                                     errorMessage = "Resource not found";
                                 } else if (networkResponse.statusCode == 401) {
-                                    errorMessage = message+" Please login again";
+                                    errorMessage = message + " Please login again";
                                 } else if (networkResponse.statusCode == 400) {
-                                    errorMessage = message+ " Check your inputs";
+                                    errorMessage = message + " Check your inputs";
                                 } else if (networkResponse.statusCode == 500) {
-                                    errorMessage = message+" Something is getting wrong";
+                                    errorMessage = message +" Something is getting wrong";
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -426,20 +477,21 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
                         error.printStackTrace();
                     }
                 }) {
-//                    @Override
-//                    protected Map<String, String> getParams() {
-//                        Map<String, String> params = new HashMap<>();
-//                        params.put("contact", mContactInput.getText().toString());
-//                        return params;
-//                    }
+                    @Override
+                    protected Map<String, String> getParams() {
+                        Map<String, String> params = new HashMap<>();
+                        params.put("style", style);
+                        return params;
+                    }
 
                     @Override
                     protected Map<String, DataPart> getByteData() {
                         Map<String, DataPart> params = new HashMap<>();
                         // file name could found file base or direct access from real path
                         // for now just get bitmap data from ImageView
+                        drawView.destroyDrawingCache();
 
-                        params.put("file", new DataPart("test.png", getFileDataFromDrawable(drawView.getDrawingCache()), "image/png"));
+                        params.put("file", new DataPart("test.png", getFileDataFromDrawable(scaleDown(drawView.getDrawingCache(), MAX_IMAGE_SIZE, true)), "image/png"));
 
                         return params;
                     }
@@ -483,5 +535,21 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
             // other 'case' lines to check for other
             // permissions this app might request.
         }
+    }
+
+    public static Bitmap scaleDown(Bitmap realImage, float maxImageSize,
+                                   boolean filter) {
+//        Log.d("Pre-resize Width", String.valueOf(realImage.getWidth()));
+//        Log.d("Pre-resize Height", String.valueOf(realImage.getHeight()));
+        float ratio = Math.min(
+                maxImageSize / realImage.getWidth(),
+                maxImageSize / realImage.getHeight());
+        int width = Math.round(ratio * realImage.getWidth());
+        int height = Math.round(ratio * realImage.getHeight());
+
+//        Log.d("Pre-resize Width", String.valueOf(width));
+//        Log.d("Pre-resize Height", String.valueOf(height));
+
+        return Bitmap.createScaledBitmap(realImage, width, height, filter);
     }
 }
