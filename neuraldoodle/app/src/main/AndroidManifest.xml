@@ -39,7 +39,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SketchActivity"></activity>
+            android:name=".SketchActivity"></activity
         <activity
             android:name=".NewProjectActivity"
             android:windowSoftInputMode="stateHidden"></activity>
