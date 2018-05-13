@@ -376,12 +376,8 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
                 // Handle unsuccessful uploads
                 Toast.makeText(getApplicationContext(),"image upload failed ",Toast.LENGTH_LONG).show();
             }
-        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-
-            }
         });
+
         progressBar.setVisibility(View.GONE);
     }
 

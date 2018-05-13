@@ -7,23 +7,23 @@
 
     <RelativeLayout
         android:layout_height="match_parent"
-        android:layout_width="match_parent" >
+        android:layout_width="match_parent">
+
         <com.example.vinzee.neural_doodle.FadeInNetworkImageView
             android:id="@+id/networkImageView"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:adjustViewBounds="true"
             android:scaleType="fitXY"
-            android:gravity="center"
-            />
+            android:gravity="center" />
+
         <com.example.vinzee.neural_doodle.FadeInNetworkImageView
             android:id="@+id/backImageView"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:adjustViewBounds="true"
             android:scaleType="fitXY"
-            android:gravity="center"
-            />
+            android:gravity="center" />
 
         <ProgressBar
             android:id="@+id/progressBar"
@@ -34,6 +34,7 @@
             android:layout_centerInParent="true"
             android:visibility="gone" />
     </RelativeLayout>
+
     <TextView
         android:id="@+id/artistName"
         android:layout_width="wrap_content"
@@ -64,7 +65,7 @@
         android:layout_gravity="end|bottom"
         android:backgroundTint="@color/bg_main"
         app:borderWidth="0dp"
-        android:src="@drawable/ic_email"
+        android:src="@drawable/ic_chat"
         android:layout_marginRight="16dip"
         android:layout_marginBottom="10dip"/>
 

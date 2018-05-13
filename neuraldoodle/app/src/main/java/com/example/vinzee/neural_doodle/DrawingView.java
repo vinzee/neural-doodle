@@ -160,4 +160,9 @@ public class DrawingView extends View {
         drawPaint.setColor(paintColor);
         drawPaint.setAlpha(paintAlpha);
     }
+
+    public void setCanvasBitmap (Bitmap bitmap) {
+        drawCanvas.drawBitmap(bitmap, 0, 0, null);
+        invalidate();
+    }
 }

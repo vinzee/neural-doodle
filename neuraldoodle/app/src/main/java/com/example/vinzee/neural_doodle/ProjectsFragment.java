@@ -10,13 +10,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 
@@ -24,15 +24,14 @@ import java.util.ArrayList;
  * A simple {@link Fragment} subclass.
  */
 public class ProjectsFragment extends Fragment {
-    private static final String TAG = SignupActivity.class.getSimpleName();
     private String uid;
     private FirebaseAuth auth;
 
     private DatabaseReference mFirebaseDatabase;
     private FirebaseDatabase mFirebaseInstance;
     private View view;
-    private StorageReference mStorageRef;
-    private View progressBar;
+    private RecyclerView recyclerView;
+    private ArrayList<Project> projectList;
 
     public ProjectsFragment() {
         // Required empty public constructor
@@ -52,23 +51,22 @@ public class ProjectsFragment extends Fragment {
         mFirebaseDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                ArrayList<Project> projectList = new ArrayList<>();
+                projectList = new ArrayList<>();
 
                 for (DataSnapshot projectSnapshot: dataSnapshot.getChildren()) {
                     Project project = projectSnapshot.getValue(Project.class);
-                    Object projectName = projectSnapshot.child("project-name").getValue();
+                    Object projectName = projectSnapshot.child("name").getValue();
                     project.name = (projectName == null) ? "Untitled" : projectName.toString();
                     project.id = projectSnapshot.getKey();
                     projectList.add(project);
                 }
 
                 RecyclerViewAdapter adapter = new RecyclerViewAdapter(projectList);
-                RecyclerView myView =  view.findViewById(R.id.recyclerview);
-                myView.setHasFixedSize(true);
-                myView.setAdapter(adapter);
+                recyclerView.setHasFixedSize(true);
+                recyclerView.setAdapter(adapter);
                 LinearLayoutManager llm = new LinearLayoutManager(getActivity());
                 llm.setOrientation(LinearLayoutManager.VERTICAL);
-                myView.setLayoutManager(llm);
+                recyclerView.setLayoutManager(llm);
             }
 
             @Override
@@ -93,7 +91,26 @@ public class ProjectsFragment extends Fragment {
             }
         });
 
-        progressBar = view.findViewById(R.id.progressBar);
+        recyclerView =  view.findViewById(R.id.recyclerview);
+        recyclerView.addOnItemTouchListener(
+                new RecyclerItemClickListener(view.getContext(), recyclerView ,new RecyclerItemClickListener.OnItemClickListener() {
+                    @Override public void onItemClick(View view, int position) {
+                        Project project = projectList.get(position);
+
+                        Intent intent = new Intent(getActivity(), CanvasActivity.class);
+                        intent.putExtra("projectId", project.id);
+                        intent.putExtra("name", project.name);
+                        intent.putExtra("userId", uid);
+                        intent.putExtra("style", project.style);
+
+                        startActivity(intent);
+                    }
+
+                    @Override public void onLongItemClick(View view, int position) {
+                        Log.d("onLongItemClick", "onItemClick " + position);
+                    }
+                })
+        );
 
         return view;
     }

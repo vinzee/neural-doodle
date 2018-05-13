@@ -23,7 +23,7 @@
                     android:layout_width="@dimen/user_w_h"
                     android:layout_height="@dimen/user_w_h"
                     android:layout_gravity="center_horizontal"
-                    android:src="@mipmap/user"
+                    android:src="@drawable/ic_person"
                     android:layout_marginBottom="20dp"
                     android:id="@+id/profile_image"/>
                 <!---->

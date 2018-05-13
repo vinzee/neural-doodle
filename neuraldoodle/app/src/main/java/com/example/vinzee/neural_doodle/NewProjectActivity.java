@@ -61,7 +61,7 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
         String projectKey = mFirebaseDatabase.child(userId).push().getKey();
         String style = ((RadioButton)findViewById(styleRadioGroup.getCheckedRadioButtonId())).getText().toString();
 
-        mFirebaseDatabase.child(userId).child(projectKey).child("project-name").setValue(projectName);
+        mFirebaseDatabase.child(userId).child(projectKey).child("name").setValue(projectName);
         mFirebaseDatabase.child(userId).child(projectKey).child("style").setValue(style);
         mFirebaseDatabase.child(userId).child(projectKey).child("sketchExists").setValue(false);
 
