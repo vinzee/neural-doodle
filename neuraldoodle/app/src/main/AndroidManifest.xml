@@ -49,7 +49,7 @@
             android:name=".NewProjectActivity"
             android:windowSoftInputMode="stateHidden"></activity>
         <activity
-            android:name=".UpdateUserProfileActivity"
+            android:name=".UserProfileActivity"
             android:windowSoftInputMode="stateHidden"></activity>
     </application>
 

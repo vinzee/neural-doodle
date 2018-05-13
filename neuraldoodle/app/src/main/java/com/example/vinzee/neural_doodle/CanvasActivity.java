@@ -160,7 +160,7 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
         .addOnFailureListener(new OnFailureListener(){
             @Override
             public void onFailure(@NonNull Exception e) {
-                Log.d("onFailure", "!!!!! image loading failed !!!!!");
+                Log.d("onFailure", "!!!!! image loading failed: " + e.getMessage());
             }
         });
 
@@ -223,7 +223,7 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
     public boolean onOptionsItemSelected(MenuItem item) {
         //R.id.action_settings
         switch (item.getItemId()) {
-            case R.id.settings:Intent intent = new Intent(this, UpdateUserProfileActivity.class);
+            case R.id.settings:Intent intent = new Intent(this, UserProfileActivity.class);
                 startActivity(intent);
                 return true;
 

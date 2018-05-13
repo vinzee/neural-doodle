@@ -61,7 +61,7 @@ public class HomeActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.settings:
-                Intent intent = new Intent(HomeActivity.this, UpdateUserProfileActivity.class);
+                Intent intent = new Intent(HomeActivity.this, UserProfileActivity.class);
                 startActivity(intent);
                 return true;
 
