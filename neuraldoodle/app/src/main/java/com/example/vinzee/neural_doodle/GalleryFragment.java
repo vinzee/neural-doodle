@@ -23,8 +23,7 @@ import java.util.ArrayList;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ProjectsFragment extends Fragment {
-    private static final String TAG = SignupActivity.class.getSimpleName();
+public class GalleryFragment extends Fragment {
     private String uid;
     private FirebaseAuth auth;
 
@@ -34,7 +33,7 @@ public class ProjectsFragment extends Fragment {
     private StorageReference mStorageRef;
     private View progressBar;
 
-    public ProjectsFragment() {
+    public GalleryFragment() {
         // Required empty public constructor
     }
 
@@ -47,19 +46,21 @@ public class ProjectsFragment extends Fragment {
 
         mFirebaseInstance = FirebaseDatabase.getInstance();
         Log.d("uid: ", uid);
-        mFirebaseDatabase = mFirebaseInstance.getReference("projects").child(uid);
+        mFirebaseDatabase = mFirebaseInstance.getReference("projects");
 
         mFirebaseDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 ArrayList<Project> projectList = new ArrayList<>();
 
-                for (DataSnapshot projectSnapshot: dataSnapshot.getChildren()) {
-                    Project project = projectSnapshot.getValue(Project.class);
-                    Object projectName = projectSnapshot.child("project-name").getValue();
-                    project.name = (projectName == null) ? "Untitled" : projectName.toString();
-                    project.id = projectSnapshot.getKey();
-                    projectList.add(project);
+                for (DataSnapshot userProjects: dataSnapshot.getChildren()) {
+                    for (DataSnapshot projectSnapshot: userProjects.getChildren()) {
+                        Project project = projectSnapshot.getValue(Project.class);
+                        Object projectName = projectSnapshot.child("project-name").getValue();
+                        project.name = (projectName == null) ? "Untitled" : projectName.toString();
+                        project.id = projectSnapshot.getKey();
+                        projectList.add(project);
+                    }
                 }
 
                 RecyclerViewAdapter adapter = new RecyclerViewAdapter(projectList);

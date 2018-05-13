@@ -13,10 +13,8 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +22,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -44,7 +41,6 @@ import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -54,9 +50,8 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         // Required empty public constructor
     }
 
-    private static final String TAG = SignupActivity.class.getSimpleName();
     private EditText edtName,edtAddress,edtPhone,edtBio;
-    private Button btnUpload, btnSelectInterest;
+    private Button btnUpload; // , btnSelectInterest;
 //    private TextView tvInterests;
     private String uid;
     private FirebaseAuth auth;

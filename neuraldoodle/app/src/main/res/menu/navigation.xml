@@ -4,7 +4,11 @@
         android:id="@+id/navigation_home"
         android:icon="@mipmap/home"
         android:title="@string/title_home" />
-`    <item
+    <item
+        android:id="@+id/navigation_projects"
+        android:icon="@drawable/ic_projects"
+        android:title="@string/title_projects" />
+    <item
         android:id="@+id/navigation_messages"
         android:icon="@mipmap/chat"
         android:title="@string/title_messages" />
