@@ -22,6 +22,9 @@ import com.android.volley.toolbox.NetworkImageView;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -41,7 +44,10 @@ public class SketchActivity extends AppCompatActivity implements View.OnClickLis
     private static final int handlerCountThreshold = 6;
     private TextView artistNameText;
     private FloatingActionButton saveSketchButton;
+    private FirebaseAuth auth;
     private StorageReference mStorageRef;
+    private DatabaseReference mFirebaseDatabase;
+    private FirebaseDatabase mFirebaseInstance;
     private NetworkImageView backImgView;
 
     @Override
@@ -61,6 +67,9 @@ public class SketchActivity extends AppCompatActivity implements View.OnClickLis
 
         queue = Volley.newRequestQueue(this);
         mStorageRef = FirebaseStorage.getInstance().getReference();
+        auth = FirebaseAuth.getInstance();
+        mFirebaseInstance = FirebaseDatabase.getInstance();
+        mFirebaseDatabase = mFirebaseInstance.getReference("projects");
 
         imageLoader = new ImageLoader(queue, new ImageLoader.ImageCache() {
             private final LruCache<String, Bitmap> mCache = new LruCache<>(10);
@@ -102,7 +111,8 @@ public class SketchActivity extends AppCompatActivity implements View.OnClickLis
                 }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        Log.d("Sketch Upload", "Success!!");
+                        String userId = auth.getCurrentUser().getUid();
+                        mFirebaseDatabase.child(userId).child(projectId).child("sketchExists").setValue(true);
                     }
                 });
                 if (imgURL != null) {

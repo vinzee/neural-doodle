@@ -58,6 +58,7 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
 
         mFirebaseDatabase.child(userId).child(projectKey).child("project-name").setValue(projectNameText.getText().toString());
         mFirebaseDatabase.child(userId).child(projectKey).child("style").setValue(style);
+        mFirebaseDatabase.child(userId).child(projectKey).child("sketchExists").setValue(false);
 
         Intent intent = new Intent(NewProjectActivity.this, CanvasActivity.class);
         intent.putExtra("projectId", projectKey);

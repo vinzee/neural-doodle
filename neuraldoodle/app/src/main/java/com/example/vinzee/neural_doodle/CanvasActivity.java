@@ -122,9 +122,9 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
         saveBtn = findViewById(R.id.save_btn);
         saveBtn.setOnClickListener(this);
 
-        //opacity
-        opacityBtn = findViewById(R.id.opacity_btn);
-        opacityBtn.setOnClickListener(this);
+//        //opacity
+//        opacityBtn = findViewById(R.id.opacity_btn);
+//        opacityBtn.setOnClickListener(this);
 
         //opacity
         magicBtn = findViewById(R.id.magic_btn);
@@ -325,49 +325,49 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
                 newDialog.show();
                 break;
 
-            case R.id.opacity_btn:
-                //launch opacity chooser
-                final Dialog seekDialog = new Dialog(this);
-                seekDialog.setTitle("Opacity level:");
-                seekDialog.setContentView(R.layout.opacity_chooser);
-                //get ui elements
-                final TextView seekTxt = seekDialog.findViewById(R.id.opq_txt);
-                final SeekBar seekOpq = seekDialog.findViewById(R.id.opacity_seek);
-                //set max
-                seekOpq.setMax(100);
-                //show current level
-                int currLevel = drawView.getPaintAlpha();
-                seekTxt.setText(currLevel + "%");
-                seekOpq.setProgress(currLevel);
-                //update as user interacts
-                seekOpq.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-
-                    @Override
-                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                        seekTxt.setText(Integer.toString(progress) + "%");
-                    }
-
-                    @Override
-                    public void onStartTrackingTouch(SeekBar seekBar) {
-                    }
-
-                    @Override
-                    public void onStopTrackingTouch(SeekBar seekBar) {
-                    }
-
-                });
-                //listen for clicks on ok
-                Button opqBtn = seekDialog.findViewById(R.id.opq_ok);
-                opqBtn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        drawView.setPaintAlpha(seekOpq.getProgress());
-                        seekDialog.dismiss();
-                    }
-                });
-                //show dialog
-                seekDialog.show();
-                break;
+//            case R.id.opacity_btn:
+//                //launch opacity chooser
+//                final Dialog seekDialog = new Dialog(this);
+//                seekDialog.setTitle("Opacity level:");
+//                seekDialog.setContentView(R.layout.opacity_chooser);
+//                //get ui elements
+//                final TextView seekTxt = seekDialog.findViewById(R.id.opq_txt);
+//                final SeekBar seekOpq = seekDialog.findViewById(R.id.opacity_seek);
+//                //set max
+//                seekOpq.setMax(100);
+//                //show current level
+//                int currLevel = drawView.getPaintAlpha();
+//                seekTxt.setText(currLevel + "%");
+//                seekOpq.setProgress(currLevel);
+//                //update as user interacts
+//                seekOpq.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+//
+//                    @Override
+//                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+//                        seekTxt.setText(Integer.toString(progress) + "%");
+//                    }
+//
+//                    @Override
+//                    public void onStartTrackingTouch(SeekBar seekBar) {
+//                    }
+//
+//                    @Override
+//                    public void onStopTrackingTouch(SeekBar seekBar) {
+//                    }
+//
+//                });
+//                //listen for clicks on ok
+//                Button opqBtn = seekDialog.findViewById(R.id.opq_ok);
+//                opqBtn.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        drawView.setPaintAlpha(seekOpq.getProgress());
+//                        seekDialog.dismiss();
+//                    }
+//                });
+//                //show dialog
+//                seekDialog.show();
+//                break;
 
             case R.id.save_btn:
                 //save drawing
