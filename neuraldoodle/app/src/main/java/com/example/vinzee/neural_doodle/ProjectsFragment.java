@@ -62,7 +62,7 @@ public class ProjectsFragment extends Fragment {
                 }
 
                 RecyclerViewAdapter adapter = new RecyclerViewAdapter(projectList);
-                RecyclerView myView =  (RecyclerView) view.findViewById(R.id.recyclerview);
+                RecyclerView myView =  view.findViewById(R.id.recyclerview);
                 myView.setHasFixedSize(true);
                 myView.setAdapter(adapter);
                 LinearLayoutManager llm = new LinearLayoutManager(getActivity());

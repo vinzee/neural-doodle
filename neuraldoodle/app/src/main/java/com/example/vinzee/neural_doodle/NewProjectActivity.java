@@ -50,12 +50,18 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
 
     @Override
     public void onClick(View v) {
+        String projectName = projectNameText.getText().toString();
+
+        if (projectName == null || projectName.equals("") ) {
+            projectNameText.setError( "Project name is required!" );
+            return;
+        }
+
         String userId = auth.getCurrentUser().getUid();
         String projectKey = mFirebaseDatabase.child(userId).push().getKey();
-
         String style = ((RadioButton)findViewById(styleRadioGroup.getCheckedRadioButtonId())).getText().toString();
 
-        mFirebaseDatabase.child(userId).child(projectKey).child("project-name").setValue(projectNameText.getText().toString());
+        mFirebaseDatabase.child(userId).child(projectKey).child("project-name").setValue(projectName);
         mFirebaseDatabase.child(userId).child(projectKey).child("style").setValue(style);
 
         Intent intent = new Intent(NewProjectActivity.this, CanvasActivity.class);

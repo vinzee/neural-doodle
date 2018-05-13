@@ -2,6 +2,7 @@ package com.example.vinzee.neural_doodle;
 
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,7 +37,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public void onBindViewHolder(final MyViewHolder holder, int position) {
         final Project project = projectList.get(position);
         holder.name.setText(project.name);
-        String projectPath = "images/" + "-LC7rvUIogCxn9BJtkNl_project.png";
+        String projectPath = "images/" + project.id + "_project.png";
+        Log.d("projectPath", projectPath);
         Task<Uri> projectUriTask = storageRef.child(projectPath).getDownloadUrl();
 
         projectUriTask.addOnSuccessListener(new OnSuccessListener<Uri>() {
@@ -48,7 +50,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             }
         });
 
-        String sketchPath = "images/" + "-LCGNqcCNKfGDbJUJtL1_sketch.png";
+        String sketchPath = "images/" + project.id + "_sketch.png";
+        Log.d("sketchPath", sketchPath);
         Task<Uri> sketchUriTask = storageRef.child(sketchPath).getDownloadUrl();
 
         sketchUriTask.addOnSuccessListener(new OnSuccessListener<Uri>() {
@@ -73,8 +76,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
         public MyViewHolder(View itemView) {
             super(itemView);
-            name = (TextView) itemView.findViewById(R.id.project_name);
-            slider = (SliderLayout) itemView.findViewById(R.id.project_slider);
+
+            name = itemView.findViewById(R.id.project_name);
+            slider = itemView.findViewById(R.id.project_slider);
         }
     }
 }
