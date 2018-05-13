@@ -55,7 +55,7 @@ public class ProjectsFragment extends Fragment {
 
                 for (DataSnapshot projectSnapshot: dataSnapshot.getChildren()) {
                     Project project = projectSnapshot.getValue(Project.class);
-                    Object projectName = projectSnapshot.child("project-name").getValue();
+                    Object projectName = projectSnapshot.child("name").getValue();
                     project.name = (projectName == null) ? "Untitled" : projectName.toString();
                     project.id = projectSnapshot.getKey();
                     projectList.add(project);
