@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -30,7 +31,10 @@ public class HomeActivity extends AppCompatActivity {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.navigation_home:
-                    pushFragment(new ProjectFragment());
+                    pushFragment(new GalleryFragment());
+                    return true;
+                case R.id.navigation_projects:
+                    pushFragment(new ProjectsFragment());
                     return true;
                 case R.id.navigation_messages:
                     pushFragment(new ChatFragment());
@@ -48,7 +52,7 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_home);
-        pushFragment(new ProjectFragment());
+        pushFragment(new ProjectsFragment());
 
         auth = FirebaseAuth.getInstance();
 
@@ -80,43 +84,15 @@ public class HomeActivity extends AppCompatActivity {
         return false;
     }
 
-    private void pushFragment(ChatFragment chatFragment){
-        if(chatFragment==null)    {
+    private void pushFragment(Fragment fragment){
+        if(fragment == null)    {
             return;
         }
         FragmentManager fragmentManager = getSupportFragmentManager();
-        if (fragmentManager!=null){
+        if (fragmentManager != null){
 
             FragmentTransaction transaction = fragmentManager.beginTransaction();
-            transaction.replace(R.id.rootLayout,chatFragment);
-            transaction.commit();
-        }
-    }
-
-    private void pushFragment(ProjectFragment projectFragment){
-        if(projectFragment ==null)    {
-            return;
-        }
-
-        FragmentManager fragmentManager = getSupportFragmentManager();
-
-        if (fragmentManager!=null) {
-            FragmentTransaction transaction = fragmentManager.beginTransaction();
-            transaction.replace(R.id.rootLayout, projectFragment);
-            transaction.commit();
-        }
-    }
-
-    private void pushFragment(ProfileFragment profileFragment){
-        if(profileFragment == null)    {
-            return;
-        }
-
-        FragmentManager fragmentManager = getSupportFragmentManager();
-
-        if (fragmentManager!=null) {
-            FragmentTransaction transaction = fragmentManager.beginTransaction();
-            transaction.replace(R.id.rootLayout,profileFragment);
+            transaction.replace(R.id.rootLayout, fragment);
             transaction.commit();
         }
     }

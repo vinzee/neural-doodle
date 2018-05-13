@@ -74,8 +74,10 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
+
         //Get Firebase auth instance
         auth = FirebaseAuth.getInstance();
+
         mStorageRef = FirebaseStorage.getInstance().getReference();
         mFirebaseInstance = FirebaseDatabase.getInstance();
         mFirebaseDatabase = mFirebaseInstance.getReference("users");
@@ -439,11 +441,9 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void createUser(String name, String email, String phone, String address, String usertype, String userBio, String userInterests) {
-
-        uid=auth.getCurrentUser().getUid();
+        uid = auth.getCurrentUser().getUid();
 
         User user = new User(name, email, phone, address, usertype, userBio, userInterests);
-
         mFirebaseDatabase.child(uid).setValue(user);
 
         if (profileBitmap != null) {

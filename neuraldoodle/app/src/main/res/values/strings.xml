@@ -62,16 +62,11 @@
     <string name="title_activity_chat">ChatActivity</string>
     <string name="title_activity_update_user_profile">UpdateUserProfileActivity</string>
     <string name="title_home">Home</string>
+    <string name="title_projects">Projects</string>
     <string name="title_canvas">Canvas</string>
     <string name="title_messages">Messages</string>
     <string name="title_profile">Profile</string>
-    <string name="title_activity_main2">Main2Activity</string>
     <string name="btn_update">Update</string>
-
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="project_name">Project Name</string>
     <string name="begin">Begin</string>
-
 </resources>
