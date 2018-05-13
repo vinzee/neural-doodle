@@ -7,6 +7,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -19,11 +22,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.SeekBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
@@ -46,6 +46,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -55,9 +58,10 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
     //custom drawing view
     private DrawingView drawView;
     //buttons
-    private ImageButton currPaint, drawBtn, eraseBtn, newBtn, saveBtn, opacityBtn, magicBtn;
+    private ImageButton currPaint, drawBtn, eraseBtn, newBtn, saveBtn, magicBtn; // , opacityBtn
     //sizes
     private float smallBrush, mediumBrush, largeBrush;
+
     private RequestQueue queue;
     private final String BASE_URL = "http://43a87bf7.ngrok.io";
     private static final int MAX_IMAGE_SIZE = 600;
@@ -68,22 +72,32 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
     private String projectId;
     private String userId;
     private String style;
+    private String projectPath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        this.getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
+        this.getSupportActionBar().hide();
         setContentView(R.layout.activity_canvas);
 
-        Intent intent = getIntent();
-        projectId = intent.getStringExtra("projectId");
-        userId = intent.getStringExtra("userId");
-        projectName = intent.getStringExtra("name");
-        style = intent.getStringExtra("style");
-        queue = Volley.newRequestQueue(this);
+        try {
+            Intent intent = getIntent();
+            projectId = intent.getStringExtra("projectId");
+            userId = intent.getStringExtra("userId");
+            projectName = intent.getStringExtra("name");
+            style = intent.getStringExtra("style");
+            queue = Volley.newRequestQueue(this);
 
-        mStorageRef = FirebaseStorage.getInstance().getReference();
+            if (projectId == null) {
+                throw new Exception("ProjectId is not provided in the intent", new Throwable(""));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
 
         //get drawing view
         drawView = findViewById(R.id.drawing);
@@ -130,6 +144,26 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
         magicBtn = findViewById(R.id.magic_btn);
         magicBtn.setOnClickListener(this);
         auth = FirebaseAuth.getInstance();
+
+        projectPath = "images/" + projectId + "_project.png";
+        mStorageRef = FirebaseStorage.getInstance().getReference();
+
+
+        mStorageRef.child(projectPath).getDownloadUrl()
+        .addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                new FetchDoodle().execute(uri.toString());
+                Log.d("addOnSuccessListener: ", uri.toString());
+            }
+        })
+        .addOnFailureListener(new OnFailureListener(){
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d("onFailure", "!!!!! image loading failed !!!!!");
+            }
+        });
+
 
         // Here, thisActivity is the current activity
         if (ContextCompat.checkSelfPermission(this,
@@ -386,29 +420,7 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
                         if (imgURL != null) {
                             Toast.makeText(getApplicationContext(),
                                     "Drawing saved to Gallery: " + imgURL, Toast.LENGTH_SHORT).show();
-
-                            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                            Bitmap scaledBitmap = scaleDown(drawView.getDrawingCache(), MAX_IMAGE_SIZE, true);
-                            // drawView.getDrawingCache().compress(Bitmap.CompressFormat.JPEG,80,baos);
-                            scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 0 ,baos);
-                            byte[] data= baos.toByteArray();
-
-                            StorageReference storageReference =
-                                    mStorageRef.child("images/"+projectId+"_project.png");
-
-                            UploadTask uploadTask = storageReference.putBytes(data);
-                            uploadTask.addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception exception) {
-                                    // Handle unsuccessful uploads
-                                    Toast.makeText(getApplicationContext(),"image upload failed ",Toast.LENGTH_LONG).show();
-                                }
-                            }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                                @Override
-                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-
-                                }
-                            });
+                            saveToFireBase();
                         } else {
                             Toast.makeText(getApplicationContext(), "Oops! Image could not be saved.", Toast.LENGTH_SHORT).show();
                         }
@@ -425,6 +437,8 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
                 break;
 
             case R.id.magic_btn:
+                saveToFireBase();
+
                 VolleyMultipartRequest multipartRequest = new VolleyMultipartRequest(Request.Method.POST, BASE_URL + "?style=" +  style.toLowerCase(), new Response.Listener<NetworkResponse>() {
                     @Override
                     public void onResponse(NetworkResponse response) {
@@ -551,5 +565,54 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
 //        Log.d("Pre-resize Height", String.valueOf(height));
 
         return Bitmap.createScaledBitmap(realImage, width, height, filter);
+    }
+
+    public void saveToFireBase(){
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        // Scaling down here reduces the image resolution which thus causes a problem in loading it back the next time
+        // scaleDown(drawView.getDrawingCache(), MAX_IMAGE_SIZE, true);
+
+        Bitmap scaledBitmap = drawView.getDrawingCache();
+        drawView.getDrawingCache().compress(Bitmap.CompressFormat.JPEG,80,baos);
+        scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 100 , baos);
+
+        byte[] data= baos.toByteArray();
+        StorageReference storageReference = mStorageRef.child(projectPath);
+
+        UploadTask uploadTask = storageReference.putBytes(data);
+        uploadTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle unsuccessful uploads
+                Toast.makeText(getApplicationContext(),"image upload failed ",Toast.LENGTH_LONG).show();
+            }
+        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                Log.d("Doodle upload","image upload successful");
+            }
+        });
+    }
+
+    class FetchDoodle extends AsyncTask<String, Void, Bitmap> {
+        protected Bitmap doInBackground(String... uris) {
+            URL url = null;
+            Bitmap bitmap = null;
+
+            try {
+                url = new URL(uris[0]);
+                bitmap = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return bitmap;
+        }
+        protected void onPostExecute(Bitmap bitmap) {
+            drawView.setCanvasBitmap(bitmap);
+        }
     }
 }

@@ -13,7 +13,6 @@ import com.daimajia.slider.library.SliderLayout;
 import com.daimajia.slider.library.SliderTypes.DefaultSliderView;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -21,8 +20,7 @@ import java.util.ArrayList;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.MyViewHolder> {
     public ArrayList<Project> projectList;
-    StorageReference storageRef;
-
+    private StorageReference storageRef;
 
     public RecyclerViewAdapter (ArrayList<Project> myValues){
         this.projectList = myValues;
@@ -31,53 +29,60 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View listItem = LayoutInflater.from(parent.getContext()).inflate(R.layout.cardview, parent, false);
-        return new MyViewHolder(listItem);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.cardview, parent, false);
+        return new MyViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(final MyViewHolder holder, int position) {
         final Project project = projectList.get(position);
         holder.name.setText(project.name);
+        holder.projectID = project.id;
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("onBindViewHolder", "onClick：");
+            }
+        });
 
         String projectPath = "images/" + project.id + "_project.png";
         Log.d("projectPath", projectPath);
 
-        Task<Uri> projectUriTask = storageRef.child(projectPath).getDownloadUrl();
-        projectUriTask.addOnSuccessListener(new OnSuccessListener<Uri>() {
+        storageRef.child(projectPath).getDownloadUrl()
+        .addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
-                DefaultSliderView s1 = new DefaultSliderView(holder.slider.getContext());
-                s1.image(uri.toString());
-                holder.slider.addSlider(s1);
-            }
-        });
-        projectUriTask.addOnFailureListener(new OnFailureListener(){
+            DefaultSliderView s1 = new DefaultSliderView(holder.slider.getContext());
+            s1.image(uri.toString());
+            holder.slider.addSlider(s1);
+        }
+        })
+        .addOnFailureListener(new OnFailureListener(){
             @Override
             public void onFailure(@NonNull Exception e) {
-                Log.d("onFailure", "!!!!! image loading failed !!!!!");
+            Log.d("onFailure", "!!!!! image loading failed !!!!!");
             }
         });
 
         String sketchPath = "images/" + project.id + "_sketch.png";
         Log.d("sketchPath", sketchPath);
 
-        Task<Uri> sketchUriTask = storageRef.child(sketchPath).getDownloadUrl();
-        sketchUriTask.addOnSuccessListener(new OnSuccessListener<Uri>() {
+        storageRef.child(sketchPath).getDownloadUrl()
+        .addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
                 DefaultSliderView s1 = new DefaultSliderView(holder.slider.getContext());
                 s1.image(uri.toString());
                 holder.slider.addSlider(s1);
             }
-        });
-        sketchUriTask.addOnFailureListener(new OnFailureListener(){
+        })
+        .addOnFailureListener(new OnFailureListener(){
             @Override
             public void onFailure(@NonNull Exception e) {
                 Log.d("onFailure", "!!!!! image loading failed !!!!!");
             }
         });
-
     }
 
     @Override
@@ -86,6 +91,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     }
 
     public static class MyViewHolder extends RecyclerView.ViewHolder {
+        private String projectID;
         private TextView name;
         private SliderLayout slider;
 
@@ -95,5 +101,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             name = itemView.findViewById(R.id.project_name);
             slider = itemView.findViewById(R.id.project_slider);
         }
+
+        public String getIntent () {
+            return "hello";
+        }
     }
+
 }

@@ -4,11 +4,10 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
-import android.support.design.widget.FloatingActionButton;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.util.LruCache;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -32,7 +31,8 @@ import com.google.firebase.storage.UploadTask;
 import java.io.ByteArrayOutputStream;
 import java.util.UUID;
 
-public class SketchActivity extends AppCompatActivity implements View.OnClickListener {
+
+public class SketchActivity extends AppCompatActivity {
     private RequestQueue queue;
     private NetworkImageView networkImageView;
     private ImageLoader imageLoader;
@@ -49,18 +49,22 @@ public class SketchActivity extends AppCompatActivity implements View.OnClickLis
     private DatabaseReference mFirebaseDatabase;
     private FirebaseDatabase mFirebaseInstance;
     private NetworkImageView backImgView;
+    private String projectPath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        this.getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
+        this.getSupportActionBar().hide();
         setContentView(R.layout.activity_sketch_view);
 
         Bundle b = getIntent().getExtras();
         imageURL = b.getString("imageURL");
         style = b.getString("style");
         projectId = b.getString("projectId");
+        projectPath = "images/"+projectId+"_sketch.png";
 
         artistNameText = findViewById(R.id.artistName);
         artistNameText.setText("- " + style);
@@ -95,26 +99,9 @@ public class SketchActivity extends AppCompatActivity implements View.OnClickLis
             @Override
             public void onClick(View v) {
                 String imgURL = MediaStore.Images.Media.insertImage( getContentResolver(), networkImageView.getDrawingCache(), UUID.randomUUID().toString() + ".png", "sketch");
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                // drawView.getDrawingCache().compress(Bitmap.CompressFormat.JPEG,80,baos);
-                networkImageView.getDrawingCache().compress(Bitmap.CompressFormat.JPEG, 0 ,baos);
-                byte[] data= baos.toByteArray();
-                StorageReference storageReference = mStorageRef.child("images/"+projectId+"_sketch.png");
-                Log.d("Upload path", "images/"+projectId+"_sketch.png");
-                UploadTask uploadTask = storageReference.putBytes(data);
-                uploadTask.addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        // Handle unsuccessful uploads
-                        Toast.makeText(getApplicationContext(),"image upload failed ",Toast.LENGTH_LONG).show();
-                    }
-                }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        String userId = auth.getCurrentUser().getUid();
-                        mFirebaseDatabase.child(userId).child(projectId).child("sketchExists").setValue(true);
-                    }
-                });
+
+                saveToFireBase();
+
                 if (imgURL != null) {
                     Toast.makeText(getApplicationContext(), "Drawing saved to Gallery.", Toast.LENGTH_SHORT).show();
                 } else {
@@ -122,6 +109,29 @@ public class SketchActivity extends AppCompatActivity implements View.OnClickLis
                 }
 
                 networkImageView.destroyDrawingCache();
+            }
+        });
+    }
+
+    public void saveToFireBase() {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        // drawView.getDrawingCache().compress(Bitmap.CompressFormat.JPEG,80,baos);
+        networkImageView.getDrawingCache().compress(Bitmap.CompressFormat.JPEG, 0 ,baos);
+        byte[] data= baos.toByteArray();
+
+        StorageReference storageReference = mStorageRef.child(projectPath);
+        UploadTask uploadTask = storageReference.putBytes(data);
+        uploadTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle unsuccessful uploads
+                Toast.makeText(getApplicationContext(),"image upload failed ",Toast.LENGTH_LONG).show();
+            }
+        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                String userId = auth.getCurrentUser().getUid();
+                mFirebaseDatabase.child(userId).child(projectId).child("sketchExists").setValue(true);
             }
         });
     }
@@ -149,6 +159,7 @@ public class SketchActivity extends AppCompatActivity implements View.OnClickLis
             networkImageView.setVisibility(View.GONE);
             networkImageView.setImageUrl(imageURL + "/?time=" + System.currentTimeMillis(), imageLoader);
             progressBar.setVisibility(View.GONE);
+            saveToFireBase();
 
             if (handlerCount++ < handlerCountThreshold) {
                 handler.postDelayed(this, 1000*10);
@@ -168,9 +179,4 @@ public class SketchActivity extends AppCompatActivity implements View.OnClickLis
             }
         }
     };
-
-    @Override
-    public void onClick(View v) {
-
-    }
 }

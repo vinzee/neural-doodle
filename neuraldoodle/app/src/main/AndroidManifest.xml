@@ -17,7 +17,10 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".CanvasActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            ></activity>
+        <!--android:theme="@android:style/Theme.NoTitleBar.Fullscreen"-->
+
         <activity
             android:name=".HomeActivity"
             android:screenOrientation="portrait"/>
@@ -39,7 +42,9 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SketchActivity"></activity>
+            android:name=".SketchActivity"
+            ></activity>
+        <!--android:theme="@android:style/Theme.NoTitleBar.Fullscreen"-->
         <activity
             android:name=".NewProjectActivity"
             android:windowSoftInputMode="stateHidden"></activity>
