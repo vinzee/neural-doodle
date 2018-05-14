@@ -225,10 +225,6 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
     public boolean onOptionsItemSelected(MenuItem item) {
         //R.id.action_settings
         switch (item.getItemId()) {
-            case R.id.settings:Intent intent = new Intent(this, UserProfileActivity.class);
-                startActivity(intent);
-                return true;
-
             case R.id.logout:
                 auth.signOut();
                 Intent loginIntent = new Intent(this, LoginActivity.class);

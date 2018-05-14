@@ -64,11 +64,6 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.settings:
-                Intent intent = new Intent(HomeActivity.this, UserProfileActivity.class);
-                startActivity(intent);
-                return true;
-
             case R.id.logout:
                 auth.signOut();
                 Intent loginIntent = new Intent(HomeActivity.this, LoginActivity.class);
