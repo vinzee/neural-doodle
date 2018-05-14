@@ -12,6 +12,7 @@ import android.widget.Button;
 
 /**
  * A simple {@link Fragment} subclass.
+ * https://www.androidhive.info/2017/02/android-creating-gmail-like-inbox-using-recyclerview/
  */
 public class ChatFragment extends Fragment {
 
