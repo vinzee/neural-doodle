@@ -6,7 +6,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,7 +44,6 @@ public class ProjectsFragment extends Fragment {
         uid = auth.getCurrentUser().getUid();
 
         mFirebaseInstance = FirebaseDatabase.getInstance();
-        Log.d("uid: ", uid);
         mFirebaseDatabase = mFirebaseInstance.getReference("projects").child(uid);
 
         mFirebaseDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -95,23 +93,27 @@ public class ProjectsFragment extends Fragment {
         recyclerView.addOnItemTouchListener(
                 new RecyclerItemClickListener(view.getContext(), recyclerView ,new RecyclerItemClickListener.OnItemClickListener() {
                     @Override public void onItemClick(View view, int position) {
-                        Project project = projectList.get(position);
-
-                        Intent intent = new Intent(getActivity(), CanvasActivity.class);
-                        intent.putExtra("projectId", project.id);
-                        intent.putExtra("name", project.name);
-                        intent.putExtra("userId", uid);
-                        intent.putExtra("style", project.style);
-
-                        startActivity(intent);
+                        openCanvasActivity(position);
                     }
 
                     @Override public void onLongItemClick(View view, int position) {
-                        Log.d("onLongItemClick", "onItemClick " + position);
+                        openCanvasActivity(position);
                     }
                 })
         );
 
         return view;
+    }
+
+    private void openCanvasActivity (int position) {
+        Project project = projectList.get(position);
+
+        Intent intent = new Intent(getActivity(), CanvasActivity.class);
+        intent.putExtra("projectId", project.id);
+        intent.putExtra("name", project.name);
+        intent.putExtra("userId", uid);
+        intent.putExtra("style", project.style);
+
+        startActivity(intent);
     }
 }
