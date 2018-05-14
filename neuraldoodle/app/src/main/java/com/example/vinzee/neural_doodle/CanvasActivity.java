@@ -89,11 +89,9 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
             style = intent.getStringExtra("style");
             queue = Volley.newRequestQueue(this);
 
-            projectName = projectName.substring(0, 1).toUpperCase() + projectName.substring(1);
             setTitle(projectName);
             TextView artistName = findViewById(R.id.artistName);
             artistName.setText(projectName + " - " + style);
-
 
             if (projectId == null) {
                 throw new Exception("ProjectId is not provided in the intent", new Throwable(""));

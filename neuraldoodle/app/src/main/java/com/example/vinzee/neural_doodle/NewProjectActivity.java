@@ -57,6 +57,8 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
             return;
         }
 
+        projectName = projectName.substring(0, 1).toUpperCase() + projectName.substring(1);
+
         String userId = auth.getCurrentUser().getUid();
         String projectKey = mFirebaseDatabase.child(userId).push().getKey();
         String style = ((RadioButton)findViewById(styleRadioGroup.getCheckedRadioButtonId())).getText().toString();
@@ -67,7 +69,7 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
 
         Intent intent = new Intent(NewProjectActivity.this, CanvasActivity.class);
         intent.putExtra("projectId", projectKey);
-        intent.putExtra("name", projectNameText.getText().toString());
+        intent.putExtra("name", projectName);
         intent.putExtra("userId", userId);
         intent.putExtra("style", style);
         startActivity(intent);
