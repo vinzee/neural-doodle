@@ -191,7 +191,7 @@ public class SketchActivity extends AppCompatActivity {
             networkImageView.setImageUrl(imageURL + "/?time=" + System.currentTimeMillis(), imageLoader);
             progressBar.setVisibility(View.GONE);
 
-            Snackbar.make(findViewById(R.id.myCoordinatorLayout), "Voila, your Sketch is Ready !", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(findViewById(R.id.myCoordinatorLayout), "Voila !", Snackbar.LENGTH_SHORT).show();
 
             if (handlerCount++ < handlerCountThreshold) {
                 handler.postDelayed(this, 1000*10);
