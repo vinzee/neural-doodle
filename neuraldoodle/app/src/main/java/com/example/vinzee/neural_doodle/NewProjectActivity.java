@@ -2,9 +2,9 @@ package com.example.vinzee.neural_doodle;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -22,7 +22,7 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
         private DatabaseReference mFirebaseDatabase;
     private FirebaseDatabase mFirebaseInstance;
     private EditText projectNameText;
-    private Button beginButton;
+    private FloatingActionButton beginButton;
     private RadioGroup styleRadioGroup;
     private RadioButton renoir;
     private RadioButton monet;

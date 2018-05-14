@@ -31,11 +31,10 @@
             android:layout_alignParentLeft="true"
             android:layout_marginTop="10dip"
             android:layout_weight="1"
-            android:fontFamily="casual"
+            android:fontFamily="sans-serif-condensed"
             android:text="Test"
             android:textColor="@color/white"
-            android:textSize="20dip"
-            android:textStyle="bold"></TextView>
+            android:textSize="20dip"></TextView>
 
         <ImageButton
             android:id="@+id/new_btn"

@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.daimajia.slider.library.SliderLayout;
-import com.daimajia.slider.library.SliderTypes.DefaultSliderView;
+import com.daimajia.slider.library.SliderTypes.TextSliderView;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
@@ -37,7 +37,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     @Override
     public void onBindViewHolder(final MyViewHolder holder, int position) {
         final Project project = projectList.get(position);
-        holder.name.setText(project.name);
         holder.projectID = project.id;
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -54,8 +53,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         .addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
-            DefaultSliderView s1 = new DefaultSliderView(holder.slider.getContext());
+            TextSliderView s1 = new TextSliderView(holder.slider.getContext());
             s1.image(uri.toString());
+            s1.description(project.name);
             holder.slider.addSlider(s1);
         }
         })
@@ -73,8 +73,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         .addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
-                DefaultSliderView s1 = new DefaultSliderView(holder.slider.getContext());
+                TextSliderView s1 = new TextSliderView(holder.slider.getContext());
                 s1.image(uri.toString());
+                s1.description(project.name);
                 holder.slider.addSlider(s1);
             }
         })
