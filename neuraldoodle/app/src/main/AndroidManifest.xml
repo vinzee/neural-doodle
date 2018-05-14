@@ -42,15 +42,16 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SketchActivity"
-            ></activity>
-        <!--android:theme="@android:style/Theme.NoTitleBar.Fullscreen"-->
+            android:name=".SketchActivity">
+        </activity>
         <activity
             android:name=".NewProjectActivity"
-            android:windowSoftInputMode="stateHidden"></activity>
+            android:windowSoftInputMode="stateHidden">
+        </activity>
         <activity
             android:name=".UserProfileActivity"
-            android:windowSoftInputMode="stateHidden"></activity>
+            android:windowSoftInputMode="stateHidden">
+        </activity>
     </application>
 
 </manifest>

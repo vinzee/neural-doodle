@@ -205,7 +205,7 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if (task.isSuccessful()) {
                                         Toast.makeText(UserProfileActivity.this, "Your profile is deleted:( Create a account now!", Toast.LENGTH_SHORT).show();
-                                        startActivity(new Intent(UserProfileActivity.this, SignupActivity.class));
+                                        startActivity(new Intent(UserProfileActivity.this, LoginActivity.class));
                                         finish();
                                         progressBar.setVisibility(View.GONE);
                                     } else {
@@ -215,7 +215,6 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
                                 }
                             });
                 }
-                finish();
                 break;
         }
 
