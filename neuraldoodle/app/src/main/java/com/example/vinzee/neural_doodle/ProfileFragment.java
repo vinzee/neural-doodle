@@ -56,7 +56,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
     private EditText edtName,edtAddress,edtPhone,edtBio;
     private EditText email, password, passwordConf;
-    private Button btnUpload; // , btnSelectInterest;
+    private Button btnUpload,btnLogout; // , btnSelectInterest;
 //    private TextView tvInterests;
     private String uid;
     private FirebaseAuth auth;
@@ -113,7 +113,8 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         btnSelectInterest.setOnClickListener(this);*/
         btnUpload = (Button) profileView.findViewById(R.id.update_button);
         btnUpload.setOnClickListener(this);
-
+        btnLogout = profileView.findViewById(R.id.logout);
+        btnLogout.setOnClickListener(this);
         edtPhone.addTextChangedListener(new TextWatcher() {
             int length_before = 0;
 
@@ -180,6 +181,12 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                                 }
                             });
                 }
+                break;
+            case R.id.logout:
+                auth.signOut();
+                Intent loginIntent = new Intent(profileView.getContext(), LoginActivity.class);
+                startActivity(loginIntent);
+                getActivity().finish();
                 break;
         }
     }
