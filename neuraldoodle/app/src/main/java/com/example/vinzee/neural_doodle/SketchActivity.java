@@ -5,12 +5,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.util.LruCache;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -43,7 +43,7 @@ public class SketchActivity extends AppCompatActivity {
     private int handlerCount = 0;
     private static final int handlerCountThreshold = 6;
     private TextView artistNameText;
-    private FloatingActionButton saveSketchButton;
+    private ImageButton saveSketchButton, contactArtistButton;
     private FirebaseAuth auth;
     private StorageReference mStorageRef;
     private DatabaseReference mFirebaseDatabase;
@@ -94,11 +94,12 @@ public class SketchActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
         progressBar.setVisibility(View.VISIBLE);
 
+        contactArtistButton = findViewById(R.id.contactArtist);
         saveSketchButton = findViewById(R.id.saveSketch);
         saveSketchButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                String imgURL = MediaStore.Images.Media.insertImage( getContentResolver(), networkImageView.getDrawingCache(), UUID.randomUUID().toString() + ".png", "sketch");
+                String imgURL = MediaStore.Images.Media.insertImage( getContentResolver(), networkImageView.getDrawingCache(), projectName + "-" + style + UUID.randomUUID().toString() + ".png", "sketch");
 
                 saveToFireBase();
 

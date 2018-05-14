@@ -414,17 +414,16 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
                 saveDialog.setMessage("Save drawing to device Gallery?");
                 saveDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
+                        saveToFireBase();
 
                         //attempt to save
-
                         String imgURL = MediaStore.Images.Media.insertImage(
                                 getContentResolver(), drawView.getDrawingCache(),
-                                UUID.randomUUID().toString() + ".png", "drawing");
+                                projectName + "-" + style + UUID.randomUUID().toString() + ".png", "drawing");
 
                         if (imgURL != null) {
                             Toast.makeText(getApplicationContext(),
                                     "Drawing saved to Gallery: " + imgURL, Toast.LENGTH_SHORT).show();
-                            saveToFireBase();
                         } else {
                             Toast.makeText(getApplicationContext(), "Oops! Image could not be saved.", Toast.LENGTH_SHORT).show();
                         }

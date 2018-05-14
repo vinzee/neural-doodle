@@ -5,6 +5,57 @@
     android:orientation="vertical"
     android:gravity="center">
 
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/my_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="45dip"
+        android:background="@color/colorPrimary"
+        android:elevation="4dp"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:id="@+id/artistName"
+                android:layout_width="170dip"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_marginTop="10dip"
+                android:layout_weight="1"
+                android:fontFamily="casual"
+                android:text="Test"
+                android:textColor="@color/white"
+                android:textSize="20dip"
+                android:textStyle="bold"></TextView>
+
+            <ImageButton
+                android:id="@+id/saveSketch"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:contentDescription="@string/save"
+                android:backgroundTint="@color/colorPrimary"
+                android:src="@drawable/ic_save"
+                android:tint="@color/white"
+                android:layout_toLeftOf="@+id/contactArtist" />
+
+            <ImageButton
+                android:id="@+id/contactArtist"
+                android:layout_width="52dip"
+                android:layout_height="fill_parent"
+                android:contentDescription="@string/magic"
+                android:backgroundTint="@color/colorPrimary"
+                android:src="@drawable/ic_chat"
+                android:tint="@color/white"
+                android:scaleType="fitCenter"
+                android:layout_alignParentRight="true" />
+
+        </RelativeLayout>
+    </android.support.v7.widget.Toolbar>
+
     <RelativeLayout
         android:layout_height="match_parent"
         android:layout_width="match_parent">
@@ -34,39 +85,5 @@
             android:layout_centerInParent="true"
             android:visibility="gone" />
     </RelativeLayout>
-
-    <TextView
-        android:id="@+id/artistName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dip"
-        android:text=""
-        android:textStyle="italic|bold"
-        android:textSize="15dip"
-        android:layout_gravity="center|bottom"
-        android:layout_marginBottom="20dip"/>
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/saveSketch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="start|bottom"
-        android:backgroundTint="@color/colorPrimary"
-        app:borderWidth="0dp"
-        android:src="@drawable/ic_save"
-        android:layout_marginLeft="16dip"
-        android:layout_marginBottom="10dip"/>
-
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/contactArtist"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end|bottom"
-        android:backgroundTint="@color/colorPrimary"
-        app:borderWidth="0dp"
-        android:src="@drawable/ic_chat"
-        android:layout_marginRight="16dip"
-        android:layout_marginBottom="10dip"/>
 
 </FrameLayout>

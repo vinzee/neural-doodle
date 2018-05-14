@@ -13,7 +13,7 @@
     <android.support.v7.widget.Toolbar
         android:id="@+id/my_toolbar"
         android:layout_width="match_parent"
-        android:layout_height="50dip"
+        android:layout_height="45dip"
         android:background="@color/colorPrimary"
         android:elevation="4dp"
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
@@ -45,9 +45,7 @@
             android:backgroundTint="@color/colorPrimary"
             android:src="@drawable/ic_new"
             android:tint="@color/white"
-            android:layout_toLeftOf="@+id/save_btn"
-            />
-
+            android:layout_toLeftOf="@+id/save_btn" />
 
         <ImageButton
             android:id="@+id/save_btn"
@@ -57,8 +55,7 @@
             android:backgroundTint="@color/colorPrimary"
             android:src="@drawable/ic_save"
             android:tint="@color/white"
-            android:layout_toLeftOf="@+id/magic_btn"
-            />
+            android:layout_toLeftOf="@+id/magic_btn" />
 
         <ImageButton
             android:id="@+id/magic_btn"
@@ -69,8 +66,7 @@
             android:src="@drawable/magic"
             android:tint="@color/white"
             android:scaleType="fitCenter"
-            android:layout_alignParentRight="true"
-            />
+            android:layout_alignParentRight="true" />
 
     </RelativeLayout>
     </android.support.v7.widget.Toolbar>
