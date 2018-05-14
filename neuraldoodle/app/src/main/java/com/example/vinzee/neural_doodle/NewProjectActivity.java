@@ -33,6 +33,9 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_project);
 
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setIcon(R.mipmap.app_icon);
+
         projectNameText = findViewById(R.id.project_name);
         beginButton = findViewById(R.id.create_project_button);
         beginButton.setOnClickListener(this);

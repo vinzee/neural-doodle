@@ -17,8 +17,8 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class UserProfileActivity extends AppCompatActivity implements View.OnClickListener{
 
-    private Button btnChangeEmail, btnChangePassword, btnSendResetEmail, btnRemoveUser,
-            changeEmail, changePassword, sendEmail, remove;
+    private Button btnChangeEmail, btnChangePassword, btnRemoveUser,
+            changeEmail, changePassword, remove;
 
     private EditText oldEmail, newEmail, password, newPassword;
     private ProgressBar progressBar;
@@ -57,20 +57,14 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
         btnChangeEmail.setOnClickListener(this);
         btnChangePassword = (Button) findViewById(R.id.change_password_button);
         btnChangePassword.setOnClickListener(this);
-        btnSendResetEmail = (Button) findViewById(R.id.sending_pass_reset_button);
-        btnSendResetEmail.setOnClickListener(this);
         btnRemoveUser = (Button) findViewById(R.id.remove_user_button);
         btnRemoveUser.setOnClickListener(this);
         changeEmail = (Button) findViewById(R.id.changeEmail);
         changeEmail.setOnClickListener(this);
         changePassword = (Button) findViewById(R.id.changePass);
         changePassword.setOnClickListener(this);
-        sendEmail = (Button) findViewById(R.id.send);
-        sendEmail.setOnClickListener(this);
         remove = (Button) findViewById(R.id.remove);
         remove.setOnClickListener(this);
-
-
 
         oldEmail = (EditText) findViewById(R.id.old_email);
         newEmail = (EditText) findViewById(R.id.new_email);
@@ -83,7 +77,6 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
         newPassword.setVisibility(View.GONE);
         changeEmail.setVisibility(View.GONE);
         changePassword.setVisibility(View.GONE);
-        sendEmail.setVisibility(View.GONE);
         remove.setVisibility(View.GONE);
 
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
@@ -103,7 +96,6 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
                 newPassword.setVisibility(View.GONE);
                 changeEmail.setVisibility(View.VISIBLE);
                 changePassword.setVisibility(View.GONE);
-                sendEmail.setVisibility(View.GONE);
                 remove.setVisibility(View.GONE);
                 break;
             case R.id.changeEmail:
@@ -135,7 +127,6 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
                 newPassword.setVisibility(View.VISIBLE);
                 changeEmail.setVisibility(View.GONE);
                 changePassword.setVisibility(View.VISIBLE);
-                sendEmail.setVisibility(View.GONE);
                 remove.setVisibility(View.GONE);
                 break;
             case R.id.changePass:
@@ -162,37 +153,6 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
                     }
                 } else if (newPassword.getText().toString().trim().equals("")) {
                     newPassword.setError("Enter password");
-                    progressBar.setVisibility(View.GONE);
-                }
-                break;
-            case R.id.sending_pass_reset_button:
-                oldEmail.setVisibility(View.VISIBLE);
-                newEmail.setVisibility(View.GONE);
-                password.setVisibility(View.GONE);
-                newPassword.setVisibility(View.GONE);
-                changeEmail.setVisibility(View.GONE);
-                changePassword.setVisibility(View.GONE);
-                sendEmail.setVisibility(View.VISIBLE);
-                remove.setVisibility(View.GONE);
-                break;
-            case R.id.send:
-                progressBar.setVisibility(View.VISIBLE);
-                if (!oldEmail.getText().toString().trim().equals("")) {
-                    auth.sendPasswordResetEmail(oldEmail.getText().toString().trim())
-                            .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    if (task.isSuccessful()) {
-                                        Toast.makeText(UserProfileActivity.this, "Reset password email is sent!", Toast.LENGTH_SHORT).show();
-                                        progressBar.setVisibility(View.GONE);
-                                    } else {
-                                        Toast.makeText(UserProfileActivity.this, "Failed to send reset email!", Toast.LENGTH_SHORT).show();
-                                        progressBar.setVisibility(View.GONE);
-                                    }
-                                }
-                            });
-                } else {
-                    oldEmail.setError("Enter email");
                     progressBar.setVisibility(View.GONE);
                 }
                 break;
