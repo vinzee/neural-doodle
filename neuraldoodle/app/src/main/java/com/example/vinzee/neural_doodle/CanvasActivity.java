@@ -24,6 +24,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
@@ -67,10 +68,8 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
     private static final int MAX_IMAGE_SIZE = 600;
     private FirebaseAuth auth;
     private StorageReference mStorageRef;
-    User user = new User();
     private String projectName;
     private String projectId;
-    private String userId;
     private String style;
     private String projectPath;
 
@@ -86,10 +85,13 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
         try {
             Intent intent = getIntent();
             projectId = intent.getStringExtra("projectId");
-            userId = intent.getStringExtra("userId");
             projectName = intent.getStringExtra("name");
             style = intent.getStringExtra("style");
             queue = Volley.newRequestQueue(this);
+
+            setTitle(projectName);
+            TextView artistName = findViewById(R.id.artistName);
+            artistName.setText(projectName + " - " + style);
 
             if (projectId == null) {
                 throw new Exception("ProjectId is not provided in the intent", new Throwable(""));
@@ -104,7 +106,7 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
 
         //get the palette and first color button
         LinearLayout paintLayout = findViewById(R.id.paint_colors);
-        currPaint = (ImageButton)paintLayout.getChildAt(0);
+        currPaint = (ImageButton)paintLayout.getChildAt(2);
         currPaint.setImageDrawable(getResources().getDrawable(R.drawable.paint_pressed));
 
         //sizes from dimensions
@@ -223,10 +225,6 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
     public boolean onOptionsItemSelected(MenuItem item) {
         //R.id.action_settings
         switch (item.getItemId()) {
-            case R.id.settings:Intent intent = new Intent(this, UserProfileActivity.class);
-                startActivity(intent);
-                return true;
-
             case R.id.logout:
                 auth.signOut();
                 Intent loginIntent = new Intent(this, LoginActivity.class);
@@ -270,16 +268,16 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
                 brushDialog.setTitle("Brush size:");
                 brushDialog.setContentView(R.layout.brush_chooser);
                 //listen for clicks on size buttons
-                smallBtn = brushDialog.findViewById(R.id.small_brush);
-                smallBtn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        drawView.setErase(false);
-                        drawView.setBrushSize(smallBrush);
-                        drawView.setLastBrushSize(smallBrush);
-                        brushDialog.dismiss();
-                    }
-                });
+//                smallBtn = brushDialog.findViewById(R.id.small_brush);
+//                smallBtn.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        drawView.setErase(false);
+//                        drawView.setBrushSize(smallBrush);
+//                        drawView.setLastBrushSize(smallBrush);
+//                        brushDialog.dismiss();
+//                    }
+//                });
                 mediumBtn = brushDialog.findViewById(R.id.medium_brush);
                 mediumBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -310,15 +308,15 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
                 brushDialog.setTitle("Eraser size:");
                 brushDialog.setContentView(R.layout.brush_chooser);
                 //size buttons
-                smallBtn = brushDialog.findViewById(R.id.small_brush);
-                smallBtn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        drawView.setErase(true);
-                        drawView.setBrushSize(smallBrush);
-                        brushDialog.dismiss();
-                    }
-                });
+//                smallBtn = brushDialog.findViewById(R.id.small_brush);
+//                smallBtn.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        drawView.setErase(true);
+//                        drawView.setBrushSize(smallBrush);
+//                        brushDialog.dismiss();
+//                    }
+//                });
                 mediumBtn = brushDialog.findViewById(R.id.medium_brush);
                 mediumBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -410,17 +408,16 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
                 saveDialog.setMessage("Save drawing to device Gallery?");
                 saveDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
+                        saveToFireBase();
 
                         //attempt to save
-
                         String imgURL = MediaStore.Images.Media.insertImage(
                                 getContentResolver(), drawView.getDrawingCache(),
-                                UUID.randomUUID().toString() + ".png", "drawing");
+                                projectName + "-" + style + UUID.randomUUID().toString() + ".png", "drawing");
 
                         if (imgURL != null) {
                             Toast.makeText(getApplicationContext(),
                                     "Drawing saved to Gallery: " + imgURL, Toast.LENGTH_SHORT).show();
-                            saveToFireBase();
                         } else {
                             Toast.makeText(getApplicationContext(), "Oops! Image could not be saved.", Toast.LENGTH_SHORT).show();
                         }
@@ -451,6 +448,7 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
                         myIntent.putExtra("imageURL", imageURL);
                         myIntent.putExtra("style", style);
                         myIntent.putExtra("projectId", projectId);
+                        myIntent.putExtra("projectName", projectName);
                         CanvasActivity.this.startActivity(myIntent);
                     }
                 }, new Response.ErrorListener() {

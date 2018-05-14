@@ -27,6 +27,10 @@ public class HomeActivity extends AppCompatActivity {
 
         BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        BottomNavigationViewHelper.removeShiftMode(navigation);
+
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setIcon(R.mipmap.app_icon);
     }
 
     @Override
@@ -60,11 +64,6 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.settings:
-                Intent intent = new Intent(HomeActivity.this, UserProfileActivity.class);
-                startActivity(intent);
-                return true;
-
             case R.id.logout:
                 auth.signOut();
                 Intent loginIntent = new Intent(HomeActivity.this, LoginActivity.class);

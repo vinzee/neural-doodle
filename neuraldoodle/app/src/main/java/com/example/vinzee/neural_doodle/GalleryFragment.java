@@ -58,6 +58,7 @@ public class GalleryFragment extends Fragment {
                         Project project = projectSnapshot.getValue(Project.class);
                         Object projectName = projectSnapshot.child("name").getValue();
                         project.name = (projectName == null) ? "Untitled" : projectName.toString();
+                        project.name = project.name.substring(0, 1).toUpperCase() + project.name.substring(1);
                         project.id = projectSnapshot.getKey();
                         projectList.add(project);
                     }

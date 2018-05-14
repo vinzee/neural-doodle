@@ -27,6 +27,7 @@
                     android:hint="@string/project_name"
                     android:inputType="textPersonName"
                     android:maxLines="1"
+                    android:maxLength="15"
                     android:singleLine="true"
                     android:textColorHint="@color/colorAccent"
                     android:textColor="@color/colorAccent"/>
@@ -43,8 +44,8 @@
                     android:id="@+id/textView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="18dip"
-                    android:text="Pick a Style:" />
+                    android:textSize="20dip"
+                    android:text="Pick a Style" />
 
                 <RadioGroup
                     android:id="@+id/styleRadioGroup"

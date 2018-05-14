@@ -5,12 +5,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.util.LruCache;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,17 +39,16 @@ public class SketchActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private Handler handler = new Handler();
     private Handler handler2 = new Handler();
-    private String imageURL, style, projectId;
+    private String imageURL, style, projectId, projectName, projectPath;
     private int handlerCount = 0;
     private static final int handlerCountThreshold = 6;
     private TextView artistNameText;
-    private FloatingActionButton saveSketchButton;
+    private ImageButton saveSketchButton, contactArtistButton;
     private FirebaseAuth auth;
     private StorageReference mStorageRef;
     private DatabaseReference mFirebaseDatabase;
     private FirebaseDatabase mFirebaseInstance;
     private NetworkImageView backImgView;
-    private String projectPath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,16 +57,17 @@ public class SketchActivity extends AppCompatActivity {
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         this.getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
         this.getSupportActionBar().hide();
-        setContentView(R.layout.activity_sketch_view);
+        setContentView(R.layout.activity_sketch);
 
         Bundle b = getIntent().getExtras();
         imageURL = b.getString("imageURL");
         style = b.getString("style");
         projectId = b.getString("projectId");
+        projectName = b.getString("projectName");
         projectPath = "images/"+projectId+"_sketch.png";
 
         artistNameText = findViewById(R.id.artistName);
-        artistNameText.setText("- " + style);
+        artistNameText.setText(projectName + " - " + style);
 
         queue = Volley.newRequestQueue(this);
         mStorageRef = FirebaseStorage.getInstance().getReference();
@@ -94,11 +94,12 @@ public class SketchActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
         progressBar.setVisibility(View.VISIBLE);
 
+        contactArtistButton = findViewById(R.id.contactArtist);
         saveSketchButton = findViewById(R.id.saveSketch);
         saveSketchButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                String imgURL = MediaStore.Images.Media.insertImage( getContentResolver(), networkImageView.getDrawingCache(), UUID.randomUUID().toString() + ".png", "sketch");
+                String imgURL = MediaStore.Images.Media.insertImage( getContentResolver(), networkImageView.getDrawingCache(), projectName + "-" + style + UUID.randomUUID().toString() + ".png", "sketch");
 
                 saveToFireBase();
 
@@ -159,7 +160,6 @@ public class SketchActivity extends AppCompatActivity {
             networkImageView.setVisibility(View.GONE);
             networkImageView.setImageUrl(imageURL + "/?time=" + System.currentTimeMillis(), imageLoader);
             progressBar.setVisibility(View.GONE);
-            saveToFireBase();
 
             if (handlerCount++ < handlerCountThreshold) {
                 handler.postDelayed(this, 1000*10);
@@ -173,6 +173,7 @@ public class SketchActivity extends AppCompatActivity {
             networkImageView.setVisibility(View.VISIBLE);
             backImgView.setVisibility(View.GONE);
             backImgView.setImageUrl(imageURL + "/?time=" + System.currentTimeMillis(), imageLoader);
+            saveToFireBase();
 
             if (handlerCount++ < handlerCountThreshold) {
                 handler2.postDelayed(this, 1000*10);
