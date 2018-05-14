@@ -54,7 +54,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:textSize="20dip"
-                        android:text="Pick a Style" />
+                        android:text="Pick an Artist" />
 
                     <RadioGroup
                         android:id="@+id/styleRadioGroup"

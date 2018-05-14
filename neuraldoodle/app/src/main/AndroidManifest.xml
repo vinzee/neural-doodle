@@ -15,10 +15,16 @@
         android:roundIcon="@mipmap/app_icon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <activity
             android:name=".CanvasActivity"
+<<<<<<< HEAD
             android:screenOrientation="portrait" />
         <!-- android:theme="@android:style/Theme.NoTitleBar.Fullscreen" -->
+=======
+            android:screenOrientation="portrait"
+            ></activity>
+>>>>>>> ff5496e3a18215e6c97fda06c760ccbc0ee8b308
 
         <activity
             android:name=".HomeActivity"
@@ -26,11 +32,16 @@
         <activity
             android:name=".SignupActivity"
             android:screenOrientation="portrait" />
+<<<<<<< HEAD
         <activity
             android:name=".LoginActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ResetPasswordActivity"
+=======
+
+        <activity android:name=".LoginActivity"
+>>>>>>> ff5496e3a18215e6c97fda06c760ccbc0ee8b308
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -38,15 +49,28 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".ResetPasswordActivity"
+            android:screenOrientation="portrait">
+        </activity>
+
         <activity android:name=".SketchActivity" />
+
         <activity
             android:name=".ListUser"
             android:label="@string/title_activity_list_user"
             android:theme="@style/AppTheme.NoActionBar" />
+
         <activity
             android:name=".Messaging"
             android:label="@string/title_activity_messaging"
+<<<<<<< HEAD
             android:theme="@style/AppTheme.NoActionBar"></activity>
+=======
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+
+>>>>>>> ff5496e3a18215e6c97fda06c760ccbc0ee8b308
         <activity
             android:name=".NewProjectActivity"
             android:windowSoftInputMode="stateHidden"></activity>
