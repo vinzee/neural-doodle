@@ -33,11 +33,11 @@ public class HomeActivity extends AppCompatActivity {
         getSupportActionBar().setIcon(R.mipmap.app_icon);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main_menu, menu);
-        return true;
-    }
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        getMenuInflater().inflate(R.menu.main_menu, menu);
+//        return true;
+//    }
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -61,19 +61,19 @@ public class HomeActivity extends AppCompatActivity {
             return false;
         }
     };
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.logout:
-                auth.signOut();
-                Intent loginIntent = new Intent(HomeActivity.this, LoginActivity.class);
-                startActivity(loginIntent);
-                finish();
-                return true;
-        }
-
-        return false;
-    }
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        switch (item.getItemId()) {
+//            case R.id.logout:
+//                auth.signOut();
+//                Intent loginIntent = new Intent(HomeActivity.this, LoginActivity.class);
+//                startActivity(loginIntent);
+//                finish();
+//                return true;
+//        }
+//
+//        return false;
+//    }
 
     private void pushFragment(Fragment fragment){
         if(fragment == null)    {
