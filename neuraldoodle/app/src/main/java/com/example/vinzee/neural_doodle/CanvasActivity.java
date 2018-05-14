@@ -86,13 +86,13 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
             Intent intent = getIntent();
             projectId = intent.getStringExtra("projectId");
             projectName = intent.getStringExtra("name");
-            projectName = projectName.substring(0, 1).toUpperCase() + projectName.substring(1);
             style = intent.getStringExtra("style");
             queue = Volley.newRequestQueue(this);
 
+            projectName = projectName.substring(0, 1).toUpperCase() + projectName.substring(1);
             setTitle(projectName);
             TextView artistName = findViewById(R.id.artistName);
-            artistName.setText(projectName);
+            artistName.setText(projectName + " - " + style);
 
 
             if (projectId == null) {
@@ -274,16 +274,16 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
                 brushDialog.setTitle("Brush size:");
                 brushDialog.setContentView(R.layout.brush_chooser);
                 //listen for clicks on size buttons
-                smallBtn = brushDialog.findViewById(R.id.small_brush);
-                smallBtn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        drawView.setErase(false);
-                        drawView.setBrushSize(smallBrush);
-                        drawView.setLastBrushSize(smallBrush);
-                        brushDialog.dismiss();
-                    }
-                });
+//                smallBtn = brushDialog.findViewById(R.id.small_brush);
+//                smallBtn.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        drawView.setErase(false);
+//                        drawView.setBrushSize(smallBrush);
+//                        drawView.setLastBrushSize(smallBrush);
+//                        brushDialog.dismiss();
+//                    }
+//                });
                 mediumBtn = brushDialog.findViewById(R.id.medium_brush);
                 mediumBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -314,15 +314,15 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
                 brushDialog.setTitle("Eraser size:");
                 brushDialog.setContentView(R.layout.brush_chooser);
                 //size buttons
-                smallBtn = brushDialog.findViewById(R.id.small_brush);
-                smallBtn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        drawView.setErase(true);
-                        drawView.setBrushSize(smallBrush);
-                        brushDialog.dismiss();
-                    }
-                });
+//                smallBtn = brushDialog.findViewById(R.id.small_brush);
+//                smallBtn.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        drawView.setErase(true);
+//                        drawView.setBrushSize(smallBrush);
+//                        brushDialog.dismiss();
+//                    }
+//                });
                 mediumBtn = brushDialog.findViewById(R.id.medium_brush);
                 mediumBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
