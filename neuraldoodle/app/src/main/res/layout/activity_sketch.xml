@@ -30,7 +30,8 @@
                 android:text="Test"
                 android:textColor="@color/white"
                 android:textSize="20dip"
-                android:textStyle="bold"></TextView>
+                android:textStyle="bold">
+            </TextView>
 
             <ImageButton
                 android:id="@+id/saveSketch"
@@ -64,25 +65,27 @@
             android:id="@+id/networkImageView"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:layout_marginTop="50dip"
-            android:layout_marginBottom="5dip"
-            android:layout_marginLeft="5dip"
-            android:layout_marginRight="5dip"
+            android:layout_marginTop="55dip"
+            android:layout_marginBottom="10dip"
+            android:layout_marginLeft="10dip"
+            android:layout_marginRight="10dip"
             android:adjustViewBounds="true"
             android:scaleType="fitXY"
-            android:gravity="center" />
+            android:gravity="center"
+            />
 
         <com.example.vinzee.neural_doodle.FadeInNetworkImageView
             android:id="@+id/backImageView"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:layout_marginTop="50dip"
-            android:layout_marginBottom="5dip"
-            android:layout_marginLeft="5dip"
-            android:layout_marginRight="5dip"
+            android:layout_marginTop="55dip"
+            android:layout_marginBottom="10dip"
+            android:layout_marginLeft="10dip"
+            android:layout_marginRight="10dip"
             android:adjustViewBounds="true"
             android:scaleType="fitXY"
-            android:gravity="center" />
+            android:gravity="center"
+             />
 
         <ProgressBar
             android:id="@+id/progressBar"
