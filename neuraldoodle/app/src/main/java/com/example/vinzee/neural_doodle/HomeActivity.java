@@ -9,19 +9,13 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
-import com.google.firebase.auth.FirebaseAuth;
-
 public class HomeActivity extends AppCompatActivity {
-    private FirebaseAuth auth;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_home);
         pushFragment(new GalleryFragment());
-
-        auth = FirebaseAuth.getInstance();
 
         BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
@@ -30,12 +24,6 @@ public class HomeActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setIcon(R.mipmap.app_icon);
     }
-
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        getMenuInflater().inflate(R.menu.main_menu, menu);
-//        return true;
-//    }
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -59,25 +47,14 @@ public class HomeActivity extends AppCompatActivity {
             return false;
         }
     };
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        switch (item.getItemId()) {
-//            case R.id.logout:
-//                auth.signOut();
-//                Intent loginIntent = new Intent(HomeActivity.this, LoginActivity.class);
-//                startActivity(loginIntent);
-//                finish();
-//                return true;
-//        }
-//
-//        return false;
-//    }
 
     private void pushFragment(Fragment fragment){
         if(fragment == null)    {
             return;
         }
+
         FragmentManager fragmentManager = getSupportFragmentManager();
+
         if (fragmentManager != null){
 
             FragmentTransaction transaction = fragmentManager.beginTransaction();
