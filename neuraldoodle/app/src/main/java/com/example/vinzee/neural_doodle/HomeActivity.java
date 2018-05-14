@@ -1,6 +1,5 @@
 package com.example.vinzee.neural_doodle;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -8,7 +7,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Menu;
 import android.view.MenuItem;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -21,7 +19,7 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_home);
-        pushFragment(new ProjectsFragment());
+        pushFragment(new GalleryFragment());
 
         auth = FirebaseAuth.getInstance();
 
