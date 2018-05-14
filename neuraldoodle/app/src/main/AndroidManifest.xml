@@ -17,9 +17,8 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".CanvasActivity"
-            android:screenOrientation="portrait"
-            ></activity>
-        <!--android:theme="@android:style/Theme.NoTitleBar.Fullscreen"-->
+            android:screenOrientation="portrait" />
+        <!-- android:theme="@android:style/Theme.NoTitleBar.Fullscreen" -->
 
         <activity
             android:name=".HomeActivity"
@@ -27,12 +26,12 @@
         <activity
             android:name=".SignupActivity"
             android:screenOrientation="portrait" />
-        <activity android:name=".LoginActivity"
-            android:screenOrientation="portrait"/>
-
-        <activity android:name=".ResetPasswordActivity"
+        <activity
+            android:name=".LoginActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ResetPasswordActivity"
             android:screenOrientation="portrait">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -47,12 +46,14 @@
         <activity
             android:name=".Messaging"
             android:label="@string/title_activity_messaging"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity
             android:name=".NewProjectActivity"
-            android:windowSoftInputMode="stateHidden">
-        </activity>
+            android:windowSoftInputMode="stateHidden"></activity>
+        <activity
+            android:name=".MessageList"
+            android:label="@string/title_activity_message_list"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>
