@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v4.util.LruCache;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -189,6 +190,8 @@ public class SketchActivity extends AppCompatActivity {
             networkImageView.setVisibility(View.GONE);
             networkImageView.setImageUrl(imageURL + "/?time=" + System.currentTimeMillis(), imageLoader);
             progressBar.setVisibility(View.GONE);
+
+            Snackbar.make(findViewById(R.id.myCoordinatorLayout), "Voila, your Sketch is Ready !", Snackbar.LENGTH_SHORT).show();
 
             if (handlerCount++ < handlerCountThreshold) {
                 handler.postDelayed(this, 1000*10);

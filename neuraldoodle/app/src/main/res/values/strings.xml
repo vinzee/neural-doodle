@@ -66,4 +66,6 @@
     <string name="btn_update">Update</string>
     <string name="project_name">Project Name</string>
     <string name="begin">Begin</string>
+    <string name="title_activity_list_user">Users</string>
+    <string name="title_activity_messaging">Messaging</string>
 </resources>
