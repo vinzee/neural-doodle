@@ -24,6 +24,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
@@ -67,10 +68,8 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
     private static final int MAX_IMAGE_SIZE = 600;
     private FirebaseAuth auth;
     private StorageReference mStorageRef;
-    User user = new User();
     private String projectName;
     private String projectId;
-    private String userId;
     private String style;
     private String projectPath;
 
@@ -86,10 +85,15 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
         try {
             Intent intent = getIntent();
             projectId = intent.getStringExtra("projectId");
-            userId = intent.getStringExtra("userId");
             projectName = intent.getStringExtra("name");
+            projectName = projectName.substring(0, 1).toUpperCase() + projectName.substring(1);
             style = intent.getStringExtra("style");
             queue = Volley.newRequestQueue(this);
+
+            setTitle(projectName);
+            TextView artistName = findViewById(R.id.artistName);
+            artistName.setText(projectName);
+
 
             if (projectId == null) {
                 throw new Exception("ProjectId is not provided in the intent", new Throwable(""));
@@ -104,7 +108,7 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
 
         //get the palette and first color button
         LinearLayout paintLayout = findViewById(R.id.paint_colors);
-        currPaint = (ImageButton)paintLayout.getChildAt(0);
+        currPaint = (ImageButton)paintLayout.getChildAt(2);
         currPaint.setImageDrawable(getResources().getDrawable(R.drawable.paint_pressed));
 
         //sizes from dimensions
@@ -451,6 +455,7 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
                         myIntent.putExtra("imageURL", imageURL);
                         myIntent.putExtra("style", style);
                         myIntent.putExtra("projectId", projectId);
+                        myIntent.putExtra("projectName", projectName);
                         CanvasActivity.this.startActivity(myIntent);
                     }
                 }, new Response.ErrorListener() {
