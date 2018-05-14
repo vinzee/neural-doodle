@@ -13,7 +13,6 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -24,15 +23,17 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -44,7 +45,6 @@ import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -54,9 +54,9 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         // Required empty public constructor
     }
 
-    private static final String TAG = SignupActivity.class.getSimpleName();
     private EditText edtName,edtAddress,edtPhone,edtBio;
-    private Button btnUpload, btnSelectInterest;
+    private EditText email, password, passwordConf;
+    private Button btnUpload,btnLogout; // , btnSelectInterest;
 //    private TextView tvInterests;
     private String uid;
     private FirebaseAuth auth;
@@ -70,6 +70,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private View profileView;
     private Activity linkedActivity;
     private User user;
+    private FirebaseUser fireBaseUser;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -81,6 +82,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         mFirebaseInstance = FirebaseDatabase.getInstance();
         mFirebaseDatabase = mFirebaseInstance.getReference();
         uid = auth.getCurrentUser().getUid();
+        fireBaseUser = FirebaseAuth.getInstance().getCurrentUser();
         linkedActivity = getActivity();
     }
 
@@ -96,17 +98,23 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         ArrayAdapter<CharSequence> typeAdapter = ArrayAdapter.createFromResource(linkedActivity,
                 R.array.profile_type_array,android.R.layout.simple_spinner_item);
         typeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        edtName = (EditText) profileView.findViewById(R.id.name);
-        edtAddress = (EditText) profileView.findViewById(R.id.address);
-        edtPhone = (EditText) profileView.findViewById(R.id.phone);
-        edtBio = (EditText) profileView.findViewById(R.id.bio);
-//        tvInterests = (TextView) profileView.findViewById(R.id.userInterest);
+        edtName = profileView.findViewById(R.id.name);
+        edtAddress = profileView.findViewById(R.id.address);
+        edtPhone = profileView.findViewById(R.id.phone);
+        edtBio = profileView.findViewById(R.id.bio);
+        email = profileView.findViewById(R.id.email);
+        email.setText(fireBaseUser.getEmail().toString());
+        password = profileView.findViewById(R.id.password);
+        passwordConf = profileView.findViewById(R.id.passwordConf);
+
+//        tvInterests = profileView.findViewById(R.id.userInterest);
 
         /*btnSelectInterest=(Button) profileView.findViewById(R.id.selectInterest);
         btnSelectInterest.setOnClickListener(this);*/
         btnUpload = (Button) profileView.findViewById(R.id.update_button);
         btnUpload.setOnClickListener(this);
-
+        btnLogout = profileView.findViewById(R.id.logout);
+        btnLogout.setOnClickListener(this);
         edtPhone.addTextChangedListener(new TextWatcher() {
             int length_before = 0;
 
@@ -157,6 +165,28 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             case R.id.btn_select_art:
                 Intent pickPhoto = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 startActivityForResult(pickPhoto, PICK_ARTIST_IMAGE);
+                break;
+            case R.id.remove_user_button:
+                if (user != null) {
+                    fireBaseUser.delete()
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful()) {
+                                        Toast.makeText(profileView.getContext(), "Your profile is deleted:( Create a account now!", Toast.LENGTH_SHORT).show();
+                                        startActivity(new Intent(profileView.getContext(), LoginActivity.class));
+                                    } else {
+                                        Toast.makeText(profileView.getContext(), "Failed to delete your account!", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+                }
+                break;
+            case R.id.logout:
+                auth.signOut();
+                Intent loginIntent = new Intent(profileView.getContext(), LoginActivity.class);
+                startActivity(loginIntent);
+                getActivity().finish();
                 break;
         }
     }
@@ -376,6 +406,51 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
     private void updateUser() {
         User new_user = new User();
+
+
+        if (!email.getText().toString().trim().equals("") && !email.getText().toString().trim().equals(fireBaseUser.getEmail())) {
+            fireBaseUser.updateEmail(email.getText().toString().trim())
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                Toast.makeText(profileView.getContext(), "Email address is updated. Please sign in with new email id!", Toast.LENGTH_LONG).show();
+                            } else {
+                                Toast.makeText(profileView.getContext(), "Failed to update email!", Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    e.printStackTrace();
+                    Log.d("onFailure", e.getMessage());
+                }
+            });
+        }
+
+        if (!password.getText().toString().trim().equals("")) {
+            if (!password.getText().toString().equals(passwordConf.getText().toString())) {
+                password.setError("Password and Confirm Password must be same!");
+                return;
+            } else if (password.getText().toString().trim().length() < 6) {
+                password.setError("Password too short, enter minimum 6 characters");
+                return;
+            } else {
+                fireBaseUser.updatePassword(password.getText().toString().trim())
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    Toast.makeText(profileView.getContext(), "Password is updated, sign in with new password!", Toast.LENGTH_SHORT).show();
+                                    auth.signOut();
+
+                                } else {
+                                    Toast.makeText(profileView.getContext(), "Failed to update password!", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+            }
+        }
 
         new_user.name = edtName.getText().toString();
         new_user.phone = edtPhone.getText().toString();

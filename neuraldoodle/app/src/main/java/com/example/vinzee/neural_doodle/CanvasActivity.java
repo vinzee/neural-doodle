@@ -7,11 +7,15 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -19,10 +23,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,6 +48,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -55,43 +60,55 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
     //custom drawing view
     private DrawingView drawView;
     //buttons
-    private ImageButton currPaint, drawBtn, eraseBtn, newBtn, saveBtn, opacityBtn, magicBtn;
+    private ImageButton currPaint, drawBtn, eraseBtn, newBtn, saveBtn, magicBtn; // , opacityBtn
     //sizes
     private float smallBrush, mediumBrush, largeBrush;
+
     private RequestQueue queue;
     private final String BASE_URL = "http://43a87bf7.ngrok.io";
     private static final int MAX_IMAGE_SIZE = 600;
     private FirebaseAuth auth;
     private StorageReference mStorageRef;
-    User user = new User();
     private String projectName;
     private String projectId;
-    private String userId;
     private String style;
+    private String projectPath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        this.getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
+        this.getSupportActionBar().hide();
         setContentView(R.layout.activity_canvas);
 
-        Intent intent = getIntent();
-        projectId = intent.getStringExtra("projectId");
-        userId = intent.getStringExtra("userId");
-        projectName = intent.getStringExtra("name");
-        style = intent.getStringExtra("style");
-        queue = Volley.newRequestQueue(this);
+        try {
+            Intent intent = getIntent();
+            projectId = intent.getStringExtra("projectId");
+            projectName = intent.getStringExtra("name");
+            style = intent.getStringExtra("style");
+            queue = Volley.newRequestQueue(this);
 
-        mStorageRef = FirebaseStorage.getInstance().getReference();
+            setTitle(projectName);
+            TextView artistName = findViewById(R.id.artistName);
+            artistName.setText(projectName + " - " + style);
+
+            if (projectId == null) {
+                throw new Exception("ProjectId is not provided in the intent", new Throwable(""));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
 
         //get drawing view
         drawView = findViewById(R.id.drawing);
 
         //get the palette and first color button
         LinearLayout paintLayout = findViewById(R.id.paint_colors);
-        currPaint = (ImageButton)paintLayout.getChildAt(0);
-        currPaint.setImageDrawable(getResources().getDrawable(R.drawable.paint_pressed));
+        currPaint = (ImageButton)paintLayout.getChildAt(2);
+        currPaint.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.paint_pressed, null));
 
         //sizes from dimensions
         smallBrush = getResources().getInteger(R.integer.small_size);
@@ -101,6 +118,9 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
         //draw button
         drawBtn = findViewById(R.id.draw_btn);
         drawBtn.setOnClickListener(this);
+        drawBtn.setColorFilter(R.color.colorPrimary);
+//        drawBtn.getBackground().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary), PorterDuff.Mode.DST_IN);
+
 
         //set initial size
         drawView.setBrushSize(mediumBrush);
@@ -108,7 +128,6 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
         drawView.setDrawingCacheBackgroundColor(0xfffafafa);
         drawView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
         drawView.setColor("#FFFF0000");
-
 
         //erase button
         eraseBtn = findViewById(R.id.erase_btn);
@@ -122,14 +141,33 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
         saveBtn = findViewById(R.id.save_btn);
         saveBtn.setOnClickListener(this);
 
-        //opacity
-        opacityBtn = findViewById(R.id.opacity_btn);
-        opacityBtn.setOnClickListener(this);
+//        //opacity
+//        opacityBtn = findViewById(R.id.opacity_btn);
+//        opacityBtn.setOnClickListener(this);
 
         //opacity
         magicBtn = findViewById(R.id.magic_btn);
         magicBtn.setOnClickListener(this);
         auth = FirebaseAuth.getInstance();
+
+        projectPath = "images/" + projectId + "_project.png";
+        mStorageRef = FirebaseStorage.getInstance().getReference();
+
+        mStorageRef.child(projectPath).getDownloadUrl()
+        .addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                new FetchDoodle().execute(uri.toString());
+                Log.d("addOnSuccessListener: ", uri.toString());
+            }
+        })
+        .addOnFailureListener(new OnFailureListener(){
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d("onFailure", "!!!!! image loading failed: " + e.getMessage());
+            }
+        });
+
 
         // Here, thisActivity is the current activity
         if (ContextCompat.checkSelfPermission(this,
@@ -189,10 +227,6 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
     public boolean onOptionsItemSelected(MenuItem item) {
         //R.id.action_settings
         switch (item.getItemId()) {
-            case R.id.settings:Intent intent = new Intent(this, UpdateUserProfileActivity.class);
-                startActivity(intent);
-                return true;
-
             case R.id.logout:
                 auth.signOut();
                 Intent loginIntent = new Intent(this, LoginActivity.class);
@@ -218,8 +252,8 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
             String color = view.getTag().toString();
             drawView.setColor(color);
             // update ui
-            imgView.setImageDrawable(getResources().getDrawable(R.drawable.paint_pressed));
-            currPaint.setImageDrawable(getResources().getDrawable(R.drawable.paint));
+            imgView.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.paint_pressed, null));
+            currPaint.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.paint, null));
             currPaint = (ImageButton) view;
         }
     }
@@ -227,7 +261,7 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     public void onClick(View view){
         final Dialog brushDialog;
-        ImageButton smallBtn, mediumBtn, largeBtn;
+        ImageButton mediumBtn, largeBtn; // smallBtn
 
         switch(view.getId()) {
             case R.id.draw_btn:
@@ -236,16 +270,18 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
                 brushDialog.setTitle("Brush size:");
                 brushDialog.setContentView(R.layout.brush_chooser);
                 //listen for clicks on size buttons
-                smallBtn = brushDialog.findViewById(R.id.small_brush);
-                smallBtn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        drawView.setErase(false);
-                        drawView.setBrushSize(smallBrush);
-                        drawView.setLastBrushSize(smallBrush);
-                        brushDialog.dismiss();
-                    }
-                });
+//                smallBtn = brushDialog.findViewById(R.id.small_brush);
+//                smallBtn.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        drawView.setErase(false);
+//                        drawView.setBrushSize(smallBrush);
+//                        drawView.setLastBrushSize(smallBrush);
+//                        brushDialog.dismiss();
+//                        drawBtn.setColorFilter(R.color.colorPrimary);
+//                        eraseBtn.setColorFilter(R.color.gray);
+//                    }
+//                });
                 mediumBtn = brushDialog.findViewById(R.id.medium_brush);
                 mediumBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -254,6 +290,8 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
                         drawView.setBrushSize(mediumBrush);
                         drawView.setLastBrushSize(mediumBrush);
                         brushDialog.dismiss();
+                        drawBtn.setColorFilter(R.color.colorPrimary);
+                        eraseBtn.setColorFilter(R.color.gray);
                     }
                 });
                 largeBtn = brushDialog.findViewById(R.id.large_brush);
@@ -264,6 +302,8 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
                         drawView.setBrushSize(largeBrush);
                         drawView.setLastBrushSize(largeBrush);
                         brushDialog.dismiss();
+                        drawBtn.setColorFilter(R.color.colorPrimary);
+                        eraseBtn.setColorFilter(R.color.gray);
                     }
                 });
                 //show and wait for user interaction
@@ -276,15 +316,17 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
                 brushDialog.setTitle("Eraser size:");
                 brushDialog.setContentView(R.layout.brush_chooser);
                 //size buttons
-                smallBtn = brushDialog.findViewById(R.id.small_brush);
-                smallBtn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        drawView.setErase(true);
-                        drawView.setBrushSize(smallBrush);
-                        brushDialog.dismiss();
-                    }
-                });
+//                smallBtn = brushDialog.findViewById(R.id.small_brush);
+//                smallBtn.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        drawView.setErase(true);
+//                        drawView.setBrushSize(smallBrush);
+//                        brushDialog.dismiss();
+//                        eraseBtn.setColorFilter(R.color.colorPrimary);
+//                        drawBtn.setColorFilter(null);
+//                    }
+//                });
                 mediumBtn = brushDialog.findViewById(R.id.medium_brush);
                 mediumBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -292,6 +334,8 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
                         drawView.setErase(true);
                         drawView.setBrushSize(mediumBrush);
                         brushDialog.dismiss();
+                        eraseBtn.setColorFilter(R.color.colorPrimary);
+                        drawBtn.setColorFilter(null);
                     }
                 });
                 largeBtn = brushDialog.findViewById(R.id.large_brush);
@@ -301,6 +345,8 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
                         drawView.setErase(true);
                         drawView.setBrushSize(largeBrush);
                         brushDialog.dismiss();
+                        eraseBtn.setColorFilter(R.color.colorPrimary);
+                        drawBtn.setColorFilter(null);
                     }
                 });
                 brushDialog.show();
@@ -325,49 +371,49 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
                 newDialog.show();
                 break;
 
-            case R.id.opacity_btn:
-                //launch opacity chooser
-                final Dialog seekDialog = new Dialog(this);
-                seekDialog.setTitle("Opacity level:");
-                seekDialog.setContentView(R.layout.opacity_chooser);
-                //get ui elements
-                final TextView seekTxt = seekDialog.findViewById(R.id.opq_txt);
-                final SeekBar seekOpq = seekDialog.findViewById(R.id.opacity_seek);
-                //set max
-                seekOpq.setMax(100);
-                //show current level
-                int currLevel = drawView.getPaintAlpha();
-                seekTxt.setText(currLevel + "%");
-                seekOpq.setProgress(currLevel);
-                //update as user interacts
-                seekOpq.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-
-                    @Override
-                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                        seekTxt.setText(Integer.toString(progress) + "%");
-                    }
-
-                    @Override
-                    public void onStartTrackingTouch(SeekBar seekBar) {
-                    }
-
-                    @Override
-                    public void onStopTrackingTouch(SeekBar seekBar) {
-                    }
-
-                });
-                //listen for clicks on ok
-                Button opqBtn = seekDialog.findViewById(R.id.opq_ok);
-                opqBtn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        drawView.setPaintAlpha(seekOpq.getProgress());
-                        seekDialog.dismiss();
-                    }
-                });
-                //show dialog
-                seekDialog.show();
-                break;
+//            case R.id.opacity_btn:
+//                //launch opacity chooser
+//                final Dialog seekDialog = new Dialog(this);
+//                seekDialog.setTitle("Opacity level:");
+//                seekDialog.setContentView(R.layout.opacity_chooser);
+//                //get ui elements
+//                final TextView seekTxt = seekDialog.findViewById(R.id.opq_txt);
+//                final SeekBar seekOpq = seekDialog.findViewById(R.id.opacity_seek);
+//                //set max
+//                seekOpq.setMax(100);
+//                //show current level
+//                int currLevel = drawView.getPaintAlpha();
+//                seekTxt.setText(currLevel + "%");
+//                seekOpq.setProgress(currLevel);
+//                //update as user interacts
+//                seekOpq.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+//
+//                    @Override
+//                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+//                        seekTxt.setText(Integer.toString(progress) + "%");
+//                    }
+//
+//                    @Override
+//                    public void onStartTrackingTouch(SeekBar seekBar) {
+//                    }
+//
+//                    @Override
+//                    public void onStopTrackingTouch(SeekBar seekBar) {
+//                    }
+//
+//                });
+//                //listen for clicks on ok
+//                Button opqBtn = seekDialog.findViewById(R.id.opq_ok);
+//                opqBtn.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        drawView.setPaintAlpha(seekOpq.getProgress());
+//                        seekDialog.dismiss();
+//                    }
+//                });
+//                //show dialog
+//                seekDialog.show();
+//                break;
 
             case R.id.save_btn:
                 //save drawing
@@ -376,39 +422,16 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
                 saveDialog.setMessage("Save drawing to device Gallery?");
                 saveDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
+                        saveToFireBase();
 
                         //attempt to save
-
                         String imgURL = MediaStore.Images.Media.insertImage(
                                 getContentResolver(), drawView.getDrawingCache(),
-                                UUID.randomUUID().toString() + ".png", "drawing");
+                                projectName + "-" + style + UUID.randomUUID().toString() + ".png", "drawing");
 
                         if (imgURL != null) {
                             Toast.makeText(getApplicationContext(),
                                     "Drawing saved to Gallery: " + imgURL, Toast.LENGTH_SHORT).show();
-
-                            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                            Bitmap scaledBitmap = scaleDown(drawView.getDrawingCache(), MAX_IMAGE_SIZE, true);
-                            // drawView.getDrawingCache().compress(Bitmap.CompressFormat.JPEG,80,baos);
-                            scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 0 ,baos);
-                            byte[] data= baos.toByteArray();
-
-                            StorageReference storageReference =
-                                    mStorageRef.child("images/"+projectId+"_project.png");
-
-                            UploadTask uploadTask = storageReference.putBytes(data);
-                            uploadTask.addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception exception) {
-                                    // Handle unsuccessful uploads
-                                    Toast.makeText(getApplicationContext(),"image upload failed ",Toast.LENGTH_LONG).show();
-                                }
-                            }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                                @Override
-                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-
-                                }
-                            });
                         } else {
                             Toast.makeText(getApplicationContext(), "Oops! Image could not be saved.", Toast.LENGTH_SHORT).show();
                         }
@@ -425,6 +448,8 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
                 break;
 
             case R.id.magic_btn:
+                saveToFireBase();
+
                 VolleyMultipartRequest multipartRequest = new VolleyMultipartRequest(Request.Method.POST, BASE_URL + "?style=" +  style.toLowerCase(), new Response.Listener<NetworkResponse>() {
                     @Override
                     public void onResponse(NetworkResponse response) {
@@ -437,6 +462,7 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
                         myIntent.putExtra("imageURL", imageURL);
                         myIntent.putExtra("style", style);
                         myIntent.putExtra("projectId", projectId);
+                        myIntent.putExtra("projectName", projectName);
                         CanvasActivity.this.startActivity(myIntent);
                     }
                 }, new Response.ErrorListener() {
@@ -551,5 +577,54 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
 //        Log.d("Pre-resize Height", String.valueOf(height));
 
         return Bitmap.createScaledBitmap(realImage, width, height, filter);
+    }
+
+    public void saveToFireBase(){
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        // Scaling down here reduces the image resolution which thus causes a problem in loading it back the next time
+        // scaleDown(drawView.getDrawingCache(), MAX_IMAGE_SIZE, true);
+
+        Bitmap scaledBitmap = drawView.getDrawingCache();
+        drawView.getDrawingCache().compress(Bitmap.CompressFormat.JPEG,80,baos);
+        scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 100 , baos);
+
+        byte[] data= baos.toByteArray();
+        StorageReference storageReference = mStorageRef.child(projectPath);
+
+        UploadTask uploadTask = storageReference.putBytes(data);
+        uploadTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle unsuccessful uploads
+                Toast.makeText(getApplicationContext(),"image upload failed ",Toast.LENGTH_LONG).show();
+            }
+        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                Log.d("Doodle upload","image upload successful");
+            }
+        });
+    }
+
+    class FetchDoodle extends AsyncTask<String, Void, Bitmap> {
+        protected Bitmap doInBackground(String... uris) {
+            URL url = null;
+            Bitmap bitmap = null;
+
+            try {
+                url = new URL(uris[0]);
+                bitmap = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return bitmap;
+        }
+        protected void onPostExecute(Bitmap bitmap) {
+            drawView.setCanvasBitmap(bitmap);
+        }
     }
 }

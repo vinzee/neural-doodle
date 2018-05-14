@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:icon="@drawable/ic_color_pallete"
+        android:backgroundTint="#FFFF0000"
+        android:tag="#FFFF0000"
+        android:title="Red"
+        android:visible="false"
+        app:showAsAction="never"/>
+
+    <item
+        android:icon="@drawable/ic_color_pallete"
+        android:backgroundTint="#FFFFCC00"
+        android:tag="#FFFFCC00"
+        android:title="@string/paint"
+        android:visible="false"
+        app:showAsAction="never"/>
+
+    <item
+        android:icon="@drawable/ic_color_pallete"
+        android:backgroundTint="#FF009900"
+        android:tag="#FF009900"
+        android:title="@string/paint"
+        android:visible="false"
+        app:showAsAction="never"/>
+
+    <item
+        android:icon="@drawable/ic_color_pallete"
+        android:backgroundTint="#FF0000FF"
+        android:tag="#FF0000FF"
+        android:title="@string/paint"
+        android:visible="false"
+        app:showAsAction="never"/>
+</menu>

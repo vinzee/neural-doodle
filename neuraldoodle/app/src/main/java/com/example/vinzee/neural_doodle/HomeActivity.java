@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -23,13 +24,34 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.StorageReference;
 
 public class HomeActivity extends AppCompatActivity {
-    public static final String TAG = "HomeActivity";
-    private FirebaseAuth.AuthStateListener authListener;
     private FirebaseAuth auth;
     SharedPreferences pref;
     private StorageReference mStorageRef;
     private DatabaseReference mFirebaseDatabase;
     private FirebaseDatabase mFirebaseInstance;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        setContentView(R.layout.activity_home);
+        pushFragment(new ProjectsFragment());
+
+        auth = FirebaseAuth.getInstance();
+
+        BottomNavigationView navigation = findViewById(R.id.navigation);
+        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        BottomNavigationViewHelper.removeShiftMode(navigation);
+
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setIcon(R.mipmap.app_icon);
+    }
+
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        getMenuInflater().inflate(R.menu.main_menu, menu);
+//        return true;
+//    }
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -38,6 +60,9 @@ public class HomeActivity extends AppCompatActivity {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.navigation_home:
+                    pushFragment(new GalleryFragment());
+                    return true;
+                case R.id.navigation_projects:
                     pushFragment(new ProjectsFragment());
                     return true;
                 case R.id.navigation_messages:
@@ -50,86 +75,33 @@ public class HomeActivity extends AppCompatActivity {
             return false;
         }
     };
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        switch (item.getItemId()) {
+//            case R.id.logout:
+//                auth.signOut();
+//                Intent loginIntent = new Intent(HomeActivity.this, LoginActivity.class);
+//                startActivity(loginIntent);
+//                finish();
+//                return true;
+//        }
+//
+//        return false;
+//    }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        getSupportActionBar().setTitle("Imagination Station");
-        this.getUser();
-
-        setContentView(R.layout.activity_home);
-        pushFragment(new ProjectsFragment());
-
-        auth = FirebaseAuth.getInstance();
-
-        BottomNavigationView navigation = findViewById(R.id.navigation);
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.settings:Intent intent = new Intent(HomeActivity.this, UpdateUserProfileActivity.class);
-                startActivity(intent);
-                return true;
-
-            case R.id.logout:
-                auth.signOut();
-                Intent loginIntent = new Intent(HomeActivity.this, LoginActivity.class);
-                startActivity(loginIntent);
-                finish();
-                return true;
-        }
-
-        return false;
-    }
-
-    private void pushFragment(ChatFragment chatFragment){
-        if(chatFragment==null)    {
+    private void pushFragment(Fragment fragment){
+        if(fragment == null)    {
             return;
         }
         FragmentManager fragmentManager = getSupportFragmentManager();
-        if (fragmentManager!=null){
+        if (fragmentManager != null){
 
             FragmentTransaction transaction = fragmentManager.beginTransaction();
-            transaction.replace(R.id.rootLayout,chatFragment);
+            transaction.replace(R.id.rootLayout, fragment);
             transaction.commit();
         }
     }
 
-    private void pushFragment(ProjectsFragment projectFragment){
-        if(projectFragment ==null)    {
-            return;
-        }
-
-        FragmentManager fragmentManager = getSupportFragmentManager();
-
-        if (fragmentManager!=null) {
-            FragmentTransaction transaction = fragmentManager.beginTransaction();
-            transaction.replace(R.id.rootLayout, projectFragment);
-            transaction.commit();
-        }
-    }
-
-    private void pushFragment(ProfileFragment profileFragment){
-        if(profileFragment == null)    {
-            return;
-        }
-
-        FragmentManager fragmentManager = getSupportFragmentManager();
-
-        if (fragmentManager!=null) {
-            FragmentTransaction transaction = fragmentManager.beginTransaction();
-            transaction.replace(R.id.rootLayout,profileFragment);
-            transaction.commit();
-        }
-    }
     public void getUser() {
         final SharedPreferences pref;
         pref = getSharedPreferences("user_details",MODE_PRIVATE);
