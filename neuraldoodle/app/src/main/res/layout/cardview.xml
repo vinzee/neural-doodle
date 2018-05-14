@@ -11,7 +11,7 @@
         android:id="@+id/project_slider"
         card_view:indicator_visibility="invisible"
         android:layout_width="match_parent"
-        android:layout_height="250dp" />
+        android:layout_height="400dp" />
 
     <TextView
         android:id="@+id/project_name"

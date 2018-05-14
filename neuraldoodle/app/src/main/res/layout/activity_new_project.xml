@@ -99,6 +99,112 @@
                         android:drawableLeft="@drawable/gogh"
                         android:text="Gogh" />
 
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="15dp"
+                        android:gravity="center"
+                        android:layout_weight="1"
+                        android:text="Picasso" />
+
+                    <RadioButton
+                        android:id="@+id/picasso"
+                        android:layout_width="wrap_content"
+                        android:layout_height="250dp"
+                        android:drawableLeft="@drawable/picasso"
+                        android:text="Picasso" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="15dp"
+                        android:gravity="center"
+                        android:layout_weight="1"
+                        android:text="Artist1" />
+
+                    <RadioButton
+                        android:id="@+id/artist1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="250dp"
+                        android:drawableLeft="@drawable/artist1"
+                        android:text="Artist1" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="15dp"
+                        android:gravity="center"
+                        android:layout_weight="1"
+                        android:text="Artist2" />
+
+                    <RadioButton
+                        android:id="@+id/artist2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="250dp"
+                        android:drawableLeft="@drawable/artist2"
+                        android:text="Artist2" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="15dp"
+                        android:gravity="center"
+                        android:layout_weight="1"
+                        android:text="Artist3" />
+
+                    <RadioButton
+                        android:id="@+id/artist3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="250dp"
+                        android:drawableLeft="@drawable/artist3"
+                        android:text="Artist3" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="15dp"
+                        android:gravity="center"
+                        android:layout_weight="1"
+                        android:text="Artist4" />
+
+                    <RadioButton
+                        android:id="@+id/artist4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="250dp"
+                        android:drawableLeft="@drawable/artist4"
+                        android:text="Artist4" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="15dp"
+                        android:gravity="center"
+                        android:layout_weight="1"
+                        android:text="Artist5" />
+
+                    <RadioButton
+                        android:id="@+id/artist5"
+                        android:layout_width="wrap_content"
+                        android:layout_height="250dp"
+                        android:drawableLeft="@drawable/artist5"
+                        android:text="Artist5" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="15dp"
+                        android:gravity="center"
+                        android:layout_weight="1"
+                        android:text="Artist6" />
+
+                    <RadioButton
+                        android:id="@+id/artist6"
+                        android:layout_width="wrap_content"
+                        android:layout_height="250dp"
+                        android:drawableLeft="@drawable/artist6"
+                        android:text="Artist6" />
+
+
                 </RadioGroup>
 
                 <!--<RadioGroup-->

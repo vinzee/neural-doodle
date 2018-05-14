@@ -27,6 +27,13 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
     private RadioButton renoir;
     private RadioButton monet;
     private RadioButton gogh;
+    private RadioButton picasso;
+    private RadioButton artist1;
+    private RadioButton artist2;
+    private RadioButton artist3;
+    private RadioButton artist4;
+    private RadioButton artist5;
+    private RadioButton artist6;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +50,14 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
         renoir = findViewById(R.id.renoir);
         monet = findViewById(R.id.monet);
         gogh = findViewById(R.id.gogh);
+        picasso = findViewById(R.id.picasso);
+        artist1 = findViewById(R.id.artist1);
+        artist2 = findViewById(R.id.artist2);
+        artist3 = findViewById(R.id.artist3);
+        artist4 = findViewById(R.id.artist4);
+        artist5 = findViewById(R.id.artist5);
+        artist6 = findViewById(R.id.artist6);
+
 
         auth = FirebaseAuth.getInstance();
         mStorageRef = FirebaseStorage.getInstance().getReference();
