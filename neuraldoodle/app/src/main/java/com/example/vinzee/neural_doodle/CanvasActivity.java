@@ -15,6 +15,7 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -107,7 +108,7 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
         //get the palette and first color button
         LinearLayout paintLayout = findViewById(R.id.paint_colors);
         currPaint = (ImageButton)paintLayout.getChildAt(2);
-        currPaint.setImageDrawable(getResources().getDrawable(R.drawable.paint_pressed));
+        currPaint.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.paint_pressed, null));
 
         //sizes from dimensions
         smallBrush = getResources().getInteger(R.integer.small_size);
@@ -117,6 +118,9 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
         //draw button
         drawBtn = findViewById(R.id.draw_btn);
         drawBtn.setOnClickListener(this);
+        drawBtn.setColorFilter(R.color.colorPrimary);
+//        drawBtn.getBackground().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary), PorterDuff.Mode.DST_IN);
+
 
         //set initial size
         drawView.setBrushSize(mediumBrush);
@@ -124,7 +128,6 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
         drawView.setDrawingCacheBackgroundColor(0xfffafafa);
         drawView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
         drawView.setColor("#FFFF0000");
-
 
         //erase button
         eraseBtn = findViewById(R.id.erase_btn);
@@ -149,7 +152,6 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
 
         projectPath = "images/" + projectId + "_project.png";
         mStorageRef = FirebaseStorage.getInstance().getReference();
-
 
         mStorageRef.child(projectPath).getDownloadUrl()
         .addOnSuccessListener(new OnSuccessListener<Uri>() {
@@ -250,8 +252,8 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
             String color = view.getTag().toString();
             drawView.setColor(color);
             // update ui
-            imgView.setImageDrawable(getResources().getDrawable(R.drawable.paint_pressed));
-            currPaint.setImageDrawable(getResources().getDrawable(R.drawable.paint));
+            imgView.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.paint_pressed, null));
+            currPaint.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.paint, null));
             currPaint = (ImageButton) view;
         }
     }
@@ -259,7 +261,7 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     public void onClick(View view){
         final Dialog brushDialog;
-        ImageButton smallBtn, mediumBtn, largeBtn;
+        ImageButton mediumBtn, largeBtn; // smallBtn
 
         switch(view.getId()) {
             case R.id.draw_btn:
@@ -276,6 +278,8 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
 //                        drawView.setBrushSize(smallBrush);
 //                        drawView.setLastBrushSize(smallBrush);
 //                        brushDialog.dismiss();
+//                        drawBtn.setColorFilter(R.color.colorPrimary);
+//                        eraseBtn.setColorFilter(R.color.gray);
 //                    }
 //                });
                 mediumBtn = brushDialog.findViewById(R.id.medium_brush);
@@ -286,6 +290,8 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
                         drawView.setBrushSize(mediumBrush);
                         drawView.setLastBrushSize(mediumBrush);
                         brushDialog.dismiss();
+                        drawBtn.setColorFilter(R.color.colorPrimary);
+                        eraseBtn.setColorFilter(R.color.gray);
                     }
                 });
                 largeBtn = brushDialog.findViewById(R.id.large_brush);
@@ -296,6 +302,8 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
                         drawView.setBrushSize(largeBrush);
                         drawView.setLastBrushSize(largeBrush);
                         brushDialog.dismiss();
+                        drawBtn.setColorFilter(R.color.colorPrimary);
+                        eraseBtn.setColorFilter(R.color.gray);
                     }
                 });
                 //show and wait for user interaction
@@ -315,6 +323,8 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
 //                        drawView.setErase(true);
 //                        drawView.setBrushSize(smallBrush);
 //                        brushDialog.dismiss();
+//                        eraseBtn.setColorFilter(R.color.colorPrimary);
+//                        drawBtn.setColorFilter(null);
 //                    }
 //                });
                 mediumBtn = brushDialog.findViewById(R.id.medium_brush);
@@ -324,6 +334,8 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
                         drawView.setErase(true);
                         drawView.setBrushSize(mediumBrush);
                         brushDialog.dismiss();
+                        eraseBtn.setColorFilter(R.color.colorPrimary);
+                        drawBtn.setColorFilter(null);
                     }
                 });
                 largeBtn = brushDialog.findViewById(R.id.large_brush);
@@ -333,6 +345,8 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
                         drawView.setErase(true);
                         drawView.setBrushSize(largeBrush);
                         brushDialog.dismiss();
+                        eraseBtn.setColorFilter(R.color.colorPrimary);
+                        drawBtn.setColorFilter(null);
                     }
                 });
                 brushDialog.show();
