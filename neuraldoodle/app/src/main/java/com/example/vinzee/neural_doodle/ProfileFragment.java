@@ -457,6 +457,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         new_user.address = edtAddress.getText().toString();
         new_user.userBio = edtBio.getText().toString();
         new_user.email = email.getText().toString();
+        new_user.userType = user.userType;
 //        new_user.interests = tvInterests.getText().toString();
 
         DatabaseReference userProfileFirebaseDatabaseReference = mFirebaseDatabase.child("users").child(uid);

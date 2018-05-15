@@ -22,6 +22,7 @@ public class HomeActivity extends AppCompatActivity {
     private User user;
     private DatabaseReference mFirebaseDatabase;
     private FirebaseDatabase mFirebaseInstance;
+    private BottomNavigationView navigation;
 
 
     @Override
@@ -35,13 +36,11 @@ public class HomeActivity extends AppCompatActivity {
         mFirebaseInstance = FirebaseDatabase.getInstance();
         mFirebaseDatabase = mFirebaseInstance.getReference();
 
-        BottomNavigationView navigation = findViewById(R.id.navigation);
+        navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         BottomNavigationViewHelper.removeShiftMode(navigation);
         user = new User();
-//        if(isArtist()) {
-//            navigation.getMenu().removeItem(R.id.navigation_projects);
-//        }
+        isArtist();
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setIcon(R.mipmap.app_icon);
 
@@ -85,7 +84,7 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
-    private boolean isArtist(){
+    private void isArtist(){
 
 
         mFirebaseDatabase.child("users").child(uid).addListenerForSingleValueEvent(
@@ -93,6 +92,12 @@ public class HomeActivity extends AppCompatActivity {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         user = dataSnapshot.getValue(User.class);
+                        if(user!=null) {
+                            if (user.userType.equals("Artist")) {
+                                navigation.getMenu().removeItem(R.id.navigation_projects);
+                            }
+                        }
+
                     }
 
                     @Override
@@ -101,11 +106,7 @@ public class HomeActivity extends AppCompatActivity {
                     }
                 });
 
-        if(user!=null) {
-            if (user.userType.equals("Artist")) {
-                return true;
-            }
-        }
-        return false;
+
+        //return false;
     }
 }
