@@ -28,6 +28,7 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
     private FirebaseDatabase mFirebaseInstance;
     private EditText projectNameText;
     private FloatingActionButton beginButton;
+    private String projectName, projectId, style;
 
     private static final @DrawableRes int[] ARTIST_IMAGES = {
         R.drawable.renoir, R.drawable.monet, R.drawable.gogh, R.drawable.picasso, R.drawable.artist1, R.drawable.artist2, R.drawable.artist3, R.drawable.artist4, R.drawable.artist5, R.drawable.artist6
@@ -47,7 +48,21 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setIcon(R.mipmap.app_icon);
 
+        try {
+            Intent intent = getIntent();
+            projectId = intent.getStringExtra("projectId");
+            projectName = intent.getStringExtra("name");
+            style = intent.getStringExtra("style");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
+
         projectNameText = findViewById(R.id.project_name);
+        if (projectName != null) {
+            projectNameText.setText(projectName);
+        }
+
         beginButton = findViewById(R.id.create_project_button);
         beginButton.setOnClickListener(this);
 
@@ -85,7 +100,14 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
             }
         });
 
-        mGridView.setItemChecked(0, true);
+        if (style != null) {
+            for (int i = 0; i < ARTIST_LABELS.length; i++) {
+                if (ARTIST_LABELS[i].toLowerCase().equals(style.toLowerCase())){
+                    mGridView.setItemChecked(i, true);
+                    break;
+                }
+            }
+        }
     }
 
     @Override
@@ -102,18 +124,23 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
             return;
         }
 
+        String style = ARTIST_LABELS[mGridView.getCheckedItemPosition()];
+
         projectName = projectName.substring(0, 1).toUpperCase() + projectName.substring(1);
 
         String userId = auth.getCurrentUser().getUid();
-        String projectKey = mFirebaseDatabase.child(userId).push().getKey();
-        String style = ARTIST_LABELS[mGridView.getCheckedItemPosition()];
+        DatabaseReference userDatabaseReference = mFirebaseDatabase.child(userId);
 
-        mFirebaseDatabase.child(userId).child(projectKey).child("name").setValue(projectName);
-        mFirebaseDatabase.child(userId).child(projectKey).child("style").setValue(style);
-        mFirebaseDatabase.child(userId).child(projectKey).child("sketchExists").setValue(false);
+        if (projectId == null) {
+            projectId = userDatabaseReference.push().getKey();
+        }
+
+        userDatabaseReference.child(projectId).child("name").setValue(projectName);
+        userDatabaseReference.child(projectId).child("style").setValue(style);
+        userDatabaseReference.child(projectId).child("sketchExists").setValue(false);
 
         Intent intent = new Intent(NewProjectActivity.this, CanvasActivity.class);
-        intent.putExtra("projectId", projectKey);
+        intent.putExtra("projectId", projectId);
         intent.putExtra("name", projectName);
         intent.putExtra("userId", userId);
         intent.putExtra("style", style);

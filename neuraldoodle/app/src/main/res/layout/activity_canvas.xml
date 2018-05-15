@@ -37,6 +37,16 @@
             android:textSize="20dip"></TextView>
 
         <ImageButton
+            android:id="@+id/edit_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:contentDescription="@string/start_new"
+            android:backgroundTint="@color/colorPrimary"
+            android:src="@drawable/ic_edit"
+            android:tint="@color/white"
+            android:layout_toRightOf="@+id/artistName" />
+
+        <ImageButton
             android:id="@+id/new_btn"
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"

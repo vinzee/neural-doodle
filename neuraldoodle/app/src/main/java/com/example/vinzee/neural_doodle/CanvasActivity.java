@@ -60,18 +60,16 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
     //custom drawing view
     private DrawingView drawView;
     //buttons
-    private ImageButton currPaint, drawBtn, eraseBtn, newBtn, saveBtn, magicBtn; // , opacityBtn
+    private ImageButton currPaint, drawBtn, eraseBtn, newBtn, saveBtn, magicBtn, editBtn; // , opacityBtn
     //sizes
-    private float smallBrush, mediumBrush, largeBrush;
+    private float mediumBrush, largeBrush; // smallBrush,
 
     private RequestQueue queue;
     private final String BASE_URL = "http://43a87bf7.ngrok.io";
     private static final int MAX_IMAGE_SIZE = 600;
     private FirebaseAuth auth;
     private StorageReference mStorageRef;
-    private String projectName;
-    private String projectId;
-    private String style;
+    private String projectName, projectId, style;
     private String projectPath;
 
     @Override
@@ -111,7 +109,7 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
         currPaint.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.paint_pressed, null));
 
         //sizes from dimensions
-        smallBrush = getResources().getInteger(R.integer.small_size);
+//        smallBrush = getResources().getInteger(R.integer.small_size);
         mediumBrush = getResources().getInteger(R.integer.medium_size);
         largeBrush = getResources().getInteger(R.integer.large_size);
 
@@ -146,8 +144,13 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
 //        opacityBtn.setOnClickListener(this);
 
         //opacity
+
         magicBtn = findViewById(R.id.magic_btn);
         magicBtn.setOnClickListener(this);
+
+        editBtn = findViewById(R.id.edit_btn);
+        editBtn.setOnClickListener(this);
+
         auth = FirebaseAuth.getInstance();
 
         projectPath = "images/" + projectId + "_project.png";
@@ -264,6 +267,16 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
         ImageButton mediumBtn, largeBtn; // smallBtn
 
         switch(view.getId()) {
+            case R.id.edit_btn:
+                Intent intent = new Intent(CanvasActivity.this, NewProjectActivity.class);
+                intent.putExtra("projectId", projectId);
+                intent.putExtra("name", projectName);
+                intent.putExtra("style", style);
+
+                startActivity(intent);
+                finish();
+
+                break;
             case R.id.draw_btn:
                 //draw button clicked
                 brushDialog = new Dialog(this);
