@@ -31,7 +31,6 @@ import com.google.firebase.storage.StorageReference;
 
 import org.w3c.dom.Text;
 
-import gun0912.tedbottompicker.TedBottomPicker;
 
 public class NewProjectActivity extends AppCompatActivity implements View.OnClickListener {
 

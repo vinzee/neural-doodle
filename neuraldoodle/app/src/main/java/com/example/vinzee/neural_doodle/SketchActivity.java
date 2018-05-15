@@ -56,6 +56,7 @@ public class SketchActivity extends AppCompatActivity {
     private DatabaseReference mFirebaseDatabase;
     private FirebaseDatabase mFirebaseInstance;
     private NetworkImageView backImgView;
+    private boolean successNotified = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -191,11 +192,15 @@ public class SketchActivity extends AppCompatActivity {
             networkImageView.setImageUrl(imageURL + "/?time=" + System.currentTimeMillis(), imageLoader);
             progressBar.setVisibility(View.GONE);
 
-            Snackbar.make(findViewById(R.id.myCoordinatorLayout), "Voila !", Snackbar.LENGTH_SHORT).show();
+//            Snackbar.make(findViewById(R.id.myCoordinatorLayout), "Voila !", Snackbar.LENGTH_SHORT).show();
 
             if (handlerCount++ < handlerCountThreshold) {
                 handler.postDelayed(this, 1000*10);
+            } else if(!successNotified){
+                Snackbar.make(findViewById(R.id.myCoordinatorLayout), "\t\t\t\t\tVoila !", Snackbar.LENGTH_SHORT).show();
+                successNotified = true;
             }
+
         }
     };
 
@@ -209,6 +214,9 @@ public class SketchActivity extends AppCompatActivity {
 
             if (handlerCount++ < handlerCountThreshold) {
                 handler2.postDelayed(this, 1000*10);
+            }  else if(!successNotified){
+                Snackbar.make(findViewById(R.id.myCoordinatorLayout), "\t\t\t\t\tVoila !", Snackbar.LENGTH_SHORT).show();
+                successNotified = true;
             }
         }
     };
