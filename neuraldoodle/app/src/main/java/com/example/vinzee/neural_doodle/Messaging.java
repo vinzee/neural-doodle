@@ -45,6 +45,7 @@ public class Messaging extends AppCompatActivity {
     LinearLayout layout;
     RelativeLayout layout_2;
     ImageView sendButton;
+    TextView userName;
     EditText messageArea;
     ScrollView scrollView;
     String chatwith;
@@ -73,6 +74,9 @@ public class Messaging extends AppCompatActivity {
         usr.name = prf.getString("name",null);
         Intent intent = getIntent();
         chatwith = intent.getExtras().getString("chatwith");
+
+        userName = findViewById(R.id.userName);
+        userName.setText(chatwith);
 
 //        usrReceiver = new BroadcastReceiver() {
 //            @Override
