@@ -56,7 +56,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
     private EditText edtName,edtAddress,edtPhone,edtBio;
     private EditText email, password, passwordConf;
-    private Button btnUpload,btnLogout; // , btnSelectInterest;
+    private Button btnUpload,btnLogout,btnRemoveUser; // , btnSelectInterest;
 //    private TextView tvInterests;
     private String uid;
     private FirebaseAuth auth;
@@ -109,8 +109,8 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
 //        tvInterests = profileView.findViewById(R.id.userInterest);
 
-        /*btnSelectInterest=(Button) profileView.findViewById(R.id.selectInterest);
-        btnSelectInterest.setOnClickListener(this);*/
+        btnRemoveUser=(Button) profileView.findViewById(R.id.remove_user_button);
+        btnRemoveUser.setOnClickListener(this);
         btnUpload = (Button) profileView.findViewById(R.id.update_button);
         btnUpload.setOnClickListener(this);
         btnLogout = profileView.findViewById(R.id.logout);
@@ -162,10 +162,10 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             /*case R.id.selectInterest:
                 getInterests();
                 break;*/
-            case R.id.btn_select_art:
-                Intent pickPhoto = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(pickPhoto, PICK_ARTIST_IMAGE);
-                break;
+//            case R.id.btn_select_art:
+//                Intent pickPhoto = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+//                startActivityForResult(pickPhoto, PICK_ARTIST_IMAGE);
+//                break;
             case R.id.remove_user_button:
                 if (user != null) {
                     fireBaseUser.delete()
@@ -456,6 +456,8 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         new_user.phone = edtPhone.getText().toString();
         new_user.address = edtAddress.getText().toString();
         new_user.userBio = edtBio.getText().toString();
+        new_user.email = email.getText().toString();
+        new_user.userType = user.userType;
 //        new_user.interests = tvInterests.getText().toString();
 
         DatabaseReference userProfileFirebaseDatabaseReference = mFirebaseDatabase.child("users").child(uid);

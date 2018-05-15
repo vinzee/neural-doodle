@@ -18,6 +18,14 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 public class HomeActivity extends AppCompatActivity {
+    private String uid;
+    private FirebaseAuth auth;
+    private User user;
+    private DatabaseReference mFirebaseDatabase;
+    private FirebaseDatabase mFirebaseInstance;
+    private BottomNavigationView navigation;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,13 +33,19 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
         pushFragment(new GalleryFragment());
         this.getUser();
+        auth = FirebaseAuth.getInstance();
+        uid = auth.getCurrentUser().getUid();
+        mFirebaseInstance = FirebaseDatabase.getInstance();
+        mFirebaseDatabase = mFirebaseInstance.getReference();
 
-        BottomNavigationView navigation = findViewById(R.id.navigation);
+        navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         BottomNavigationViewHelper.removeShiftMode(navigation);
-
+        user = new User();
+        isArtist();
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setIcon(R.mipmap.app_icon);
+
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -88,19 +102,42 @@ public class HomeActivity extends AppCompatActivity {
 
 
         mFirebaseDatabase.addListenerForSingleValueEvent(
+            new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    // Get user value
+                    User userObj = dataSnapshot.getValue(User.class);
+                    SharedPreferences.Editor editor = pref.edit();
+                    editor.putString("uID",uID);
+                    editor.putString("name",userObj.name);
+                    editor.putString("email",userObj.email);
+                    editor.commit();
+
+
+                    //user.email now has your email value
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+    }
+
+    private void isArtist(){
+
+
+        mFirebaseDatabase.child("users").child(uid).addListenerForSingleValueEvent(
                 new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        // Get user value
-                        User userObj = dataSnapshot.getValue(User.class);
-                        SharedPreferences.Editor editor = pref.edit();
-                        editor.putString("uID",uID);
-                        editor.putString("name",userObj.name);
-                        editor.putString("email",userObj.email);
-                        editor.commit();
+                        user = dataSnapshot.getValue(User.class);
+                        if(user!=null) {
+                            if (user.userType.equals("Artist")) {
+                                navigation.getMenu().removeItem(R.id.navigation_projects);
+                            }
+                        }
 
-
-                        //user.email now has your email value
                     }
 
                     @Override
@@ -109,5 +146,7 @@ public class HomeActivity extends AppCompatActivity {
                     }
                 });
 
+
+        //return false;
     }
 }
