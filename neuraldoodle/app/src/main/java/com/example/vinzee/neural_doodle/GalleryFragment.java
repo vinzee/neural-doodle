@@ -10,6 +10,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -30,8 +32,9 @@ public class GalleryFragment extends Fragment {
     private DatabaseReference mFirebaseDatabase;
     private FirebaseDatabase mFirebaseInstance;
     private View view;
-    private StorageReference mStorageRef;
-    private View progressBar;
+    private User user;
+    private FloatingActionButton fab;
+    private ProgressBar progressBar;
 
     public GalleryFragment() {
         // Required empty public constructor
@@ -45,7 +48,6 @@ public class GalleryFragment extends Fragment {
         uid = auth.getCurrentUser().getUid();
 
         mFirebaseInstance = FirebaseDatabase.getInstance();
-        Log.d("uid: ", uid);
         mFirebaseDatabase = mFirebaseInstance.getReference("projects");
 
         mFirebaseDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -78,6 +80,8 @@ public class GalleryFragment extends Fragment {
 
             }
         });
+
+        isArtist();
     }
 
     @Override
@@ -86,7 +90,7 @@ public class GalleryFragment extends Fragment {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_projects, container, false);
 
-        FloatingActionButton fab = view.findViewById(R.id.fab);
+        fab = view.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -98,5 +102,27 @@ public class GalleryFragment extends Fragment {
         progressBar = view.findViewById(R.id.progressBar);
 
         return view;
+    }
+
+
+    private void isArtist(){
+        mFirebaseDatabase.child("users").child(uid)
+            .addListenerForSingleValueEvent( new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    Log.d("isArtist", uid + " : " + dataSnapshot.toString());
+                    user = dataSnapshot.getValue(User.class);
+
+                    if(user != null && user.userType.equals("Artist")) {
+                        fab.setVisibility(View.GONE);
+                    }
+
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
     }
 }

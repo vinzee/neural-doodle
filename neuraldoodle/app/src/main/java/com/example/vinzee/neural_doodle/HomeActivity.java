@@ -39,7 +39,6 @@ public class HomeActivity extends AppCompatActivity {
         navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         BottomNavigationViewHelper.removeShiftMode(navigation);
-        user = new User();
         isArtist();
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setIcon(R.mipmap.app_icon);
@@ -85,28 +84,24 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void isArtist(){
-
-
-        mFirebaseDatabase.child("users").child(uid).addListenerForSingleValueEvent(
-                new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        user = dataSnapshot.getValue(User.class);
-                        if(user!=null) {
-                            if (user.userType.equals("Artist")) {
-                                navigation.getMenu().removeItem(R.id.navigation_projects);
-                            }
+        mFirebaseDatabase.child("users").child(uid)
+        .addListenerForSingleValueEvent(
+            new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    user = dataSnapshot.getValue(User.class);
+                    if(user!=null) {
+                        if (user.userType.equals("Artist")) {
+                            navigation.getMenu().removeItem(R.id.navigation_projects);
                         }
-
                     }
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
+                }
 
-                    }
-                });
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
 
-
-        //return false;
+                }
+            });
     }
 }
