@@ -20,9 +20,9 @@ android:layout_height="fill_parent" >
         android:layout_alignTop="@id/grid_image_view"
         android:layout_alignRight="@id/grid_image_view"
         android:layout_alignBottom="@id/grid_image_view"
-        android:layout_margin="1dp"
-        android:gravity="center"
-        android:text="Hello"
+        android:layout_margin="20dp"
+        android:fontFamily="sans-serif-condensed"
+        android:textStyle="bold"
         android:textColor="#000000" />
 
 </RelativeLayout>

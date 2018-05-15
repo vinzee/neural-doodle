@@ -10,6 +10,7 @@ import android.text.Layout;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.Gallery;
@@ -42,11 +43,11 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
     private FloatingActionButton beginButton;
 
     private static final @DrawableRes int[] ARTIST_IMAGES = {
-            R.drawable.renoir, R.drawable.monet, R.drawable.gogh, R.drawable.picasso, R.drawable.artist1, R.drawable.artist2, R.drawable.artist3, R.drawable.artist4, R.drawable.artist5, R.drawable.artist6
+        R.drawable.renoir, R.drawable.monet, R.drawable.gogh, R.drawable.picasso, R.drawable.artist1, R.drawable.artist2, R.drawable.artist3, R.drawable.artist4, R.drawable.artist5, R.drawable.artist6
     };
 
     private static final String[] ARTIST_LABELS = {
-            "Renoir", "Monet", "Gogh", "Picasso", "Artist1", "Artist2", "Artist3", "Artist4", "Artist5", "Artist6"
+        "Renoir", "Monet", "Gogh", "Picasso", "Artist1", "Artist2", "Artist3", "Artist4", "Artist5", "Artist6"
     };
 
     private GridView mGridView;
@@ -83,13 +84,22 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
             @Override public View getView(final int position, View convertView, ViewGroup parent) {
                 if (convertView == null || !(convertView instanceof ImageView)) {
                     RelativeLayout relativeLayout = (RelativeLayout) getLayoutInflater().inflate(R.layout.grid_item_view, parent, false);
-                    ImageView imageView = relativeLayout.findViewById(R.id.grid_image_view);
+
+                    final ImageView imageView = relativeLayout.findViewById(R.id.grid_image_view);
                     imageView.setImageResource(ARTIST_IMAGES[position]);
-                    convertView = imageView;
 
                     TextView textView = relativeLayout.findViewById(R.id.grid_text_view);
                     textView.setText(ARTIST_LABELS[position]);
+
+                    convertView = relativeLayout;
+                    relativeLayout.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Toast.makeText(getApplicationContext(), "Selected artist - " + ARTIST_LABELS[position], Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
+
                 return convertView;
             }
         });
