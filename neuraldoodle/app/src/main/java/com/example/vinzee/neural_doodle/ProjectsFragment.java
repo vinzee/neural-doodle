@@ -98,7 +98,7 @@ public class ProjectsFragment extends Fragment {
                     }
 
                     @Override public void onLongItemClick(View view, int position) {
-                        openCanvasActivity(position);
+//                        openCanvasActivity(position);
                     }
                 })
         );

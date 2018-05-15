@@ -31,7 +31,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Messaging extends AppCompatActivity {
@@ -46,6 +48,7 @@ public class Messaging extends AppCompatActivity {
     EditText messageArea;
     ScrollView scrollView;
     String chatwith;
+    List<Message> messageList = new ArrayList<>();
 
     private Button mSendButton;
     //Firebase reference1, reference2;
@@ -101,10 +104,11 @@ public class Messaging extends AppCompatActivity {
 
                 if(!messageText.equals("")){
 
-                    Message friendlyMessage = new Message(messageText, usr.name,
-                            usr.uID + "_profile.jpg", null,Helper.GetDateTime());
-                    mFirebaseDatabaseUsr.push().setValue(friendlyMessage);
-                    mFirebaseDatabaseCht.push().setValue(friendlyMessage);
+
+                    Message friendl = new Message(messageText,usr.name,usr.uID + "Profile.jpg",null,Helper.GetDateTime());
+
+                    mFirebaseDatabaseUsr.push().setValue(friendl);
+                    mFirebaseDatabaseCht.push().setValue(friendl);
 
 //                    mFirebaseAnalytics.logEvent(MESSAGE_SENT_EVENT, null);
 //
@@ -132,6 +136,7 @@ public class Messaging extends AppCompatActivity {
                     } else {
                         addMessageBox(friendlyMessage.getText(), 2);
                     }
+                    //messageList.add(friendlyMessage);
                 }
             }
 
@@ -155,6 +160,7 @@ public class Messaging extends AppCompatActivity {
 
             }
         });
+
 
 //        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 //        fab.setOnClickListener(new View.OnClickListener() {

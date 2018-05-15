@@ -69,7 +69,7 @@ public class ListUser extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 User chatWith = ul.get(position);
-                Intent i = new Intent(ListUser.this,Messaging.class);
+                Intent i = new Intent(ListUser.this,MessageList.class);
                 i.putExtra("chatwith", chatWith.name);
                 startActivity(i);
             }

@@ -1,6 +1,8 @@
 package com.example.vinzee.neural_doodle;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
@@ -8,6 +10,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.util.LruCache;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -30,6 +33,9 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.UUID;
 
 
@@ -42,7 +48,7 @@ public class SketchActivity extends AppCompatActivity {
     private Handler handler2 = new Handler();
     private String imageURL, style, projectId, projectName, projectPath;
     private int handlerCount = 0;
-    private static final int handlerCountThreshold = 6;
+    private static final int handlerCountThreshold = 8;
     private TextView artistNameText;
     private ImageButton saveSketchButton, contactArtistButton;
     private FirebaseAuth auth;
@@ -116,34 +122,57 @@ public class SketchActivity extends AppCompatActivity {
     }
 
     public void saveToFireBase() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        // drawView.getDrawingCache().compress(Bitmap.CompressFormat.JPEG,80,baos);
-        networkImageView.getDrawingCache().compress(Bitmap.CompressFormat.JPEG, 0 ,baos);
-        byte[] data= baos.toByteArray();
+        new FetchDoodle().execute();
+    }
 
-        StorageReference storageReference = mStorageRef.child(projectPath);
-        UploadTask uploadTask = storageReference.putBytes(data);
-        uploadTask.addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                // Handle unsuccessful uploads
-                Toast.makeText(getApplicationContext(),"image upload failed ",Toast.LENGTH_LONG).show();
+    class FetchDoodle extends AsyncTask<String, Void, Bitmap> {
+        protected Bitmap doInBackground(String... uris) {
+            String urlString = imageURL + "/?time=" + System.currentTimeMillis();
+            URL url = null;
+            Bitmap bitmap = null;
+            try {
+                url = new URL(urlString);
+                bitmap = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                String userId = auth.getCurrentUser().getUid();
-                mFirebaseDatabase.child(userId).child(projectId).child("sketchExists").setValue(true);
-            }
-        });
+
+            return bitmap;
+        }
+
+        protected void onPostExecute(Bitmap bitmap) {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            // drawView.getDrawingCache().compress(Bitmap.CompressFormat.JPEG,80,baos);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+            byte[] data= baos.toByteArray();
+
+            StorageReference storageReference = mStorageRef.child(projectPath);
+            UploadTask uploadTask = storageReference.putBytes(data);
+            uploadTask.addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    // Handle unsuccessful uploads
+                    Toast.makeText(getApplicationContext(),"image upload failed ",Toast.LENGTH_LONG).show();
+                }
+            }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    Log.d("Save Status", "Successful");
+                    String userId = auth.getCurrentUser().getUid();
+                    mFirebaseDatabase.child(userId).child(projectId).child("sketchExists").setValue(true);
+                }
+            });
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if (handlerCount++ < handlerCountThreshold) {
+        if (handlerCount < handlerCountThreshold) {
             handler.postDelayed(runnable, 1000 * 1);
-            handler2.postDelayed(runnable2, 1000 * 3);
+            handler2.postDelayed(runnable2, 1000 * 5);
         }
     }
 
@@ -162,7 +191,7 @@ public class SketchActivity extends AppCompatActivity {
             networkImageView.setImageUrl(imageURL + "/?time=" + System.currentTimeMillis(), imageLoader);
             progressBar.setVisibility(View.GONE);
 
-            Snackbar.make(findViewById(R.id.myCoordinatorLayout), "Voila, your Sketch is Ready !", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(findViewById(R.id.myCoordinatorLayout), "Voila !", Snackbar.LENGTH_SHORT).show();
 
             if (handlerCount++ < handlerCountThreshold) {
                 handler.postDelayed(this, 1000*10);
