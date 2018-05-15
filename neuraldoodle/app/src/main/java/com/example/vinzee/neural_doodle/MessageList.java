@@ -100,11 +100,11 @@ public class MessageList extends AppCompatActivity {
                     if (friendlyMessage != null) {
                         friendlyMessage.setId(dataSnapshot.getKey());
                     }
-                    if (friendlyMessage.getName().equals(usr.name)) {
-                        //addMessageBox(friendlyMessage.getText(), 1);
-                    } else {
-                        // addMessageBox(friendlyMessage.getText(), 2);
-                    }
+//                    if (friendlyMessage.getName().equals(usr.name)) {
+//                        //addMessageBox(friendlyMessage.getText(), 1);
+//                    } else {
+//                        // addMessageBox(friendlyMessage.getText(), 2);
+//                    }
                     messageList.add(friendlyMessage);
                     mMessageAdapter.notifyDataSetChanged();
 

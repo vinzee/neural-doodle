@@ -131,7 +131,8 @@ public class Messaging extends AppCompatActivity {
                     if (friendlyMessage != null) {
                         friendlyMessage.setId(dataSnapshot.getKey());
                     }
-                    if (friendlyMessage.getName().equals(usr.name)) {
+                    String name = friendlyMessage.getName() == null ? "Untitled" : friendlyMessage.getName();
+                    if (name.equals(usr.name)) {
                         addMessageBox(friendlyMessage.getText(), 1);
                     } else {
                         addMessageBox(friendlyMessage.getText(), 2);

@@ -105,7 +105,6 @@ public class GalleryFragment extends Fragment {
         return view;
     }
 
-
     private void isArtist(){
         mFirebaseDatabaseUser.child("users").child(uid)
             .addListenerForSingleValueEvent( new ValueEventListener() {

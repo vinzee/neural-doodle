@@ -45,11 +45,14 @@ public class ListUser extends AppCompatActivity {
         mFirebaseDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.e(TAG, "App title updated");
                 for (DataSnapshot uniqueUserSnapshot : dataSnapshot.getChildren()) {
                     User currentUser = uniqueUserSnapshot.getValue(User.class);
                     ul.add(currentUser);
-                    userName.add(currentUser.name);
+                    if (currentUser.name != null) {
+                        userName.add(currentUser.name);
+                    } else {
+                        userName.add("Untitled");
+                    }
                 }
                 updateUserList();
 
@@ -69,7 +72,7 @@ public class ListUser extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 User chatWith = ul.get(position);
-                Intent i = new Intent(ListUser.this,MessageList.class);
+                Intent i = new Intent(ListUser.this, Messaging.class);
                 i.putExtra("chatwith", chatWith.name);
                 startActivity(i);
             }
