@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<font-family xmlns:android="http://schemas.android.com/apk/res/android">
+        <font
+            android:fontStyle="normal"
+            android:fontWeight="400"
+            android:font="@font/vitacondensedstd_regular" />
+        <font
+            android:fontStyle="normal"
+            android:fontWeight="400"
+            android:font="@font/vitacondensedstd_bold" />
+        <font
+            android:fontStyle="normal"
+            android:fontWeight="400"
+            android:font="@font/vitacondensedstd_light" />
+        <font
+            android:fontStyle="normal"
+            android:fontWeight="400"
+            android:font="@font/vitacondensedstd_extralight" />
+        <font
+            android:fontStyle="normal"
+            android:fontWeight="400"
+            android:font="@font/vitacondensedstd_medium" />
+        <font
+            android:fontStyle="normal"
+            android:fontWeight="400"
+            android:font="@font/vitacondensedstd_thin" />
+        <font
+            android:fontStyle="normal"
+            android:fontWeight="400"
+            android:font="@font/vitacondensedstd_hairline" />
+        <font
+            android:fontStyle="italic"
+            android:fontWeight="400"
+            android:font="@font/vitacondensedstd_regularitalic" />
+        <font
+            android:fontStyle="italic"
+            android:fontWeight="400"
+            android:font="@font/vitacondensedstd_bolditalic" />
+        <font
+            android:fontStyle="italic"
+            android:fontWeight="400"
+            android:font="@font/vitacondensedstd_lightitalic" />
+        <font
+            android:fontStyle="italic"
+            android:fontWeight="400"
+            android:font="@font/vitacondensedstd_extralightitalic" />
+        <font
+            android:fontStyle="italic"
+            android:fontWeight="400"
+            android:font="@font/vitacondensedstd_thinitalic" />
+        <font
+            android:fontStyle="italic"
+            android:fontWeight="400"
+            android:font="@font/vitacondensedstd_mediumitalic" />
+        <font
+            android:fontStyle="italic"
+            android:fontWeight="400"
+            android:font="@font/vitacondensedstd_hairlineitalic" />
+</font-family>

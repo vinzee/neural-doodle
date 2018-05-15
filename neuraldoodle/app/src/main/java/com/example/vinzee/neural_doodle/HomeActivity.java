@@ -1,5 +1,7 @@
 package com.example.vinzee.neural_doodle;
 
+import android.content.res.AssetManager;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -8,6 +10,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
+import android.widget.Toolbar;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -15,6 +18,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import java.util.Locale;
 
 public class HomeActivity extends AppCompatActivity {
     private String uid;
@@ -25,9 +30,11 @@ public class HomeActivity extends AppCompatActivity {
     private BottomNavigationView navigation;
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
 
         setContentView(R.layout.activity_home);
         pushFragment(new GalleryFragment());
@@ -35,6 +42,7 @@ public class HomeActivity extends AppCompatActivity {
         uid = auth.getCurrentUser().getUid();
         mFirebaseInstance = FirebaseDatabase.getInstance();
         mFirebaseDatabase = mFirebaseInstance.getReference();
+
 
         navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
@@ -44,6 +52,7 @@ public class HomeActivity extends AppCompatActivity {
         getSupportActionBar().setIcon(R.mipmap.app_icon);
 
     }
+    
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -93,6 +102,7 @@ public class HomeActivity extends AppCompatActivity {
                     if(user!=null) {
                         if (user.userType.equals("Artist")) {
                             navigation.getMenu().removeItem(R.id.navigation_projects);
+
                         }
                     }
 

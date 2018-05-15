@@ -29,7 +29,7 @@ public class GalleryFragment extends Fragment {
     private String uid;
     private FirebaseAuth auth;
 
-    private DatabaseReference mFirebaseDatabase;
+    private DatabaseReference mFirebaseDatabase, mFirebaseDatabaseUser;
     private FirebaseDatabase mFirebaseInstance;
     private View view;
     private User user;
@@ -49,6 +49,7 @@ public class GalleryFragment extends Fragment {
 
         mFirebaseInstance = FirebaseDatabase.getInstance();
         mFirebaseDatabase = mFirebaseInstance.getReference("projects");
+        mFirebaseDatabaseUser = mFirebaseInstance.getReference();
 
         mFirebaseDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -106,7 +107,7 @@ public class GalleryFragment extends Fragment {
 
 
     private void isArtist(){
-        mFirebaseDatabase.child("users").child(uid)
+        mFirebaseDatabaseUser.child("users").child(uid)
             .addListenerForSingleValueEvent( new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {

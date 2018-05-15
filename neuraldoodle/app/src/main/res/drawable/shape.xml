@@ -4,7 +4,7 @@
     <!-- you can use any color you want I used here gray color-->
     <!--<solid android:color="#FFFFFF"/>-->
     <corners android:radius="3dp"/>
-
+    <!--<font android:fontFamily="@font/vitacondensedstd-Regular" />-->
     <stroke
         android:width="1dp"
         android:color="@color/colorAccent" />
