@@ -51,7 +51,7 @@ import java.util.ArrayList;
 public class SignupActivity extends AppCompatActivity implements View.OnClickListener,AdapterView.OnItemSelectedListener{
 
     private static final String TAG = SignupActivity.class.getSimpleName();
-    private EditText inputEmail, inputPassword, inputCnfmPassword,edtName,edtAddress,edtPhone,edtEmail,edtBio;
+    private EditText inputEmail, inputPassword, inputCnfmPassword,edtName,edtAddress,edtPhone,edtBio;
     private Button btnSignIn, btnSignUp, btnResetPassword, btnSelectInterest , btnSelectArt;
     private TextView tvInterests,tvArtistArt;
     private LinearLayout artistExt;
@@ -423,7 +423,7 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
     private void createProfile()    {
 
         String name = edtName.getText().toString();
-        String email = edtEmail.getText().toString();
+        String email = inputEmail.getText().toString();
         String phone = edtPhone.getText().toString();
         String address = edtAddress.getText().toString();
         String userType = profileSpinner.getSelectedItem().toString();
