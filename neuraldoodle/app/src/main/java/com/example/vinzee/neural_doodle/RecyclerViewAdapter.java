@@ -5,8 +5,11 @@ import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.BounceInterpolator;
+import android.view.animation.CycleInterpolator;
 import android.widget.TextView;
 
 import com.daimajia.slider.library.SliderLayout;
@@ -38,7 +41,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public void onBindViewHolder(final MyViewHolder holder, int position) {
         final Project project = projectList.get(position);
         holder.projectID = project.id;
-
+//        holder.slider.setSliderTransformDuration(2000, new CycleInterpolator(0.1f));
+//        holder.slider.setDuration(10000);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
