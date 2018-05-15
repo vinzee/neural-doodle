@@ -69,17 +69,9 @@ public class ListUser extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 User chatWith = ul.get(position);
-                Intent i = new Intent(ListUser.this,Messaging.class);
+                Intent i = new Intent(ListUser.this,MessageList.class);
                 i.putExtra("chatwith", chatWith.name);
                 startActivity(i);
-            }
-        });
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
             }
         });
     }

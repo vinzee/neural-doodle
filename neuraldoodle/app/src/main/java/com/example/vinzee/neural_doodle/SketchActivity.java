@@ -1,5 +1,6 @@
 package com.example.vinzee.neural_doodle;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -118,6 +119,17 @@ public class SketchActivity extends AppCompatActivity {
                 }
 
                 networkImageView.destroyDrawingCache();
+            }
+        });
+
+        contactArtistButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                networkImageView.destroyDrawingCache();
+
+                Intent i = new Intent(SketchActivity.this,Messaging.class);
+                i.putExtra("chatwith", style);
+                startActivity(i);
             }
         });
     }

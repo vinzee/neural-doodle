@@ -1,5 +1,7 @@
 package com.example.vinzee.neural_doodle;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -38,6 +40,7 @@ public class HomeActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_home);
         pushFragment(new GalleryFragment());
+        this.getUser();
         auth = FirebaseAuth.getInstance();
         uid = auth.getCurrentUser().getUid();
         mFirebaseInstance = FirebaseDatabase.getInstance();
@@ -67,7 +70,8 @@ public class HomeActivity extends AppCompatActivity {
                     pushFragment(new ProjectsFragment());
                     return true;
                 case R.id.navigation_messages:
-                    pushFragment(new ChatFragment());
+                    Intent i = new Intent(HomeActivity.this,ListUser.class);
+                    startActivity(i);
                     return true;
                 case R.id.navigation_profile:
                     pushFragment(new ProfileFragment());
@@ -90,6 +94,44 @@ public class HomeActivity extends AppCompatActivity {
             transaction.replace(R.id.rootLayout, fragment);
             transaction.commit();
         }
+    }
+
+    public void getUser() {
+        final SharedPreferences pref;
+        pref = getSharedPreferences("user_details",MODE_PRIVATE);
+        FirebaseAuth auth;
+        DatabaseReference mFirebaseDatabase;
+        FirebaseDatabase mFirebaseInstance;
+        auth = FirebaseAuth.getInstance();
+        final String uID = auth.getCurrentUser().getUid();
+
+
+        mFirebaseInstance = FirebaseDatabase.getInstance();
+        // get reference to 'users' node
+        mFirebaseDatabase = mFirebaseInstance.getReference("users/" + uID);
+
+
+        mFirebaseDatabase.addListenerForSingleValueEvent(
+            new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    // Get user value
+                    User userObj = dataSnapshot.getValue(User.class);
+                    SharedPreferences.Editor editor = pref.edit();
+                    editor.putString("uID",uID);
+                    editor.putString("name",userObj.name);
+                    editor.putString("email",userObj.email);
+                    editor.commit();
+
+
+                    //user.email now has your email value
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
     }
 
     private void isArtist(){

@@ -18,8 +18,8 @@
 
         <activity
             android:name=".CanvasActivity"
-            android:screenOrientation="portrait"
-            ></activity>
+            android:screenOrientation="portrait" />
+
 
         <activity
             android:name=".HomeActivity"
@@ -28,9 +28,10 @@
             android:name=".SignupActivity"
             android:screenOrientation="portrait" />
 
+]
+
         <activity android:name=".LoginActivity"
             android:screenOrientation="portrait">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -57,8 +58,11 @@
 
         <activity
             android:name=".NewProjectActivity"
-            android:windowSoftInputMode="stateHidden">
-        </activity>
+            android:windowSoftInputMode="stateHidden"></activity>
+        <activity
+            android:name=".MessageList"
+            android:label="@string/title_activity_message_list"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>
