@@ -1,25 +1,16 @@
 package com.example.vinzee.neural_doodle;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.DrawableRes;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Layout;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
-import android.widget.Gallery;
 import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,8 +21,6 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import org.w3c.dom.Text;
-
-import gun0912.tedbottompicker.TedBottomPicker;
 
 public class NewProjectActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -92,12 +81,6 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
                     textView.setText(ARTIST_LABELS[position]);
 
                     convertView = relativeLayout;
-//                    relativeLayout.setOnClickListener(new View.OnClickListener() {
-//                        @Override
-//                        public void onClick(View v) {
-//                            Toast.makeText(getApplicationContext(), "Selected artist - " + ARTIST_LABELS[position], Toast.LENGTH_SHORT).show();
-//                        }
-//                    });
                 }
 
                 return convertView;
