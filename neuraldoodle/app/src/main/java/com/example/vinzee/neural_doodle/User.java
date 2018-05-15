@@ -10,12 +10,12 @@ public class User implements Serializable {
     public String address;
     public String userType;
     public String userBio;
-    public String interests;
+    //public String interests;
 
     public User(){
     }
 
-    public User( String name, String email, String phone, String address, String userType, String userBio, String interests) {
+    public User( String name, String email, String phone, String address, String userType, String userBio/*, String interests*/) {
 
         this.name = name;
         this.email = email;
@@ -23,7 +23,7 @@ public class User implements Serializable {
         this.address = address;
         this.userType = userType;
         this.userBio = userBio;
-        this.interests = interests;
+        //this.interests = interests;
     }
 
     @Override
@@ -35,7 +35,7 @@ public class User implements Serializable {
                 ", address='" + address + '\'' +
                 ", userType='" + userType + '\'' +
                 ", userBio='" + userBio + '\'' +
-                ", interests='" + interests + '\'' +
+                /*", interests='" + interests + '\'' +*/
                 '}';
     }
 }

@@ -48,13 +48,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 
-public class SignupActivity extends AppCompatActivity implements View.OnClickListener,AdapterView.OnItemSelectedListener{
+public class SignupActivity extends AppCompatActivity implements View.OnClickListener/*,AdapterView.OnItemSelectedListener*/{
 
     private static final String TAG = SignupActivity.class.getSimpleName();
     private EditText inputEmail, inputPassword, inputCnfmPassword,edtName,edtAddress,edtPhone,edtBio;
-    private Button btnSignIn, btnSignUp, btnResetPassword, btnSelectInterest , btnSelectArt;
-    private TextView tvInterests,tvArtistArt;
-    private LinearLayout artistExt;
+    private Button btnSignIn, btnSignUp, btnResetPassword;//, btnSelectInterest , btnSelectArt;
+    //private TextView tvInterests,tvArtistArt;
+    //private LinearLayout artistExt;
     private String uid;
 
     private ProgressBar progressBar;
@@ -97,13 +97,13 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
             }
         });
 
-        artistExt=(LinearLayout) findViewById(R.id.artistExtras);
+        //artistExt=(LinearLayout) findViewById(R.id.artistExtras);
         profileImg = (ImageView) findViewById(R.id.profile_image);
         profileImg.setOnClickListener(this);
-        artistExt.setVisibility(View.GONE);
+        //artistExt.setVisibility(View.GONE);
 
         profileSpinner = (Spinner) findViewById(R.id.profile_type_spinner);
-        profileSpinner.setOnItemSelectedListener(this);
+        //profileSpinner.setOnItemSelectedListener(this);
         profileSpinner.setSelection(0);
         ArrayAdapter<CharSequence> typeAdapter = ArrayAdapter.createFromResource(this,
                 R.array.profile_type_array,android.R.layout.simple_spinner_item);
@@ -113,13 +113,13 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
         edtAddress = (EditText)findViewById(R.id.address);
         edtPhone = (EditText) findViewById(R.id.phone);
         edtBio = (EditText) findViewById(R.id.bio);
-        tvInterests = (TextView) findViewById(R.id.userInterest);
-        tvArtistArt = (TextView) findViewById(R.id.artistArt);
-
-        btnSelectArt = (Button) findViewById(R.id.btn_select_art);
-        btnSelectArt.setOnClickListener(this);
-        btnSelectInterest=(Button)findViewById(R.id.selectInterest);
-        btnSelectInterest.setOnClickListener(this);
+//        tvInterests = (TextView) findViewById(R.id.userInterest);
+//        tvArtistArt = (TextView) findViewById(R.id.artistArt);
+//
+//        btnSelectArt = (Button) findViewById(R.id.btn_select_art);
+//        btnSelectArt.setOnClickListener(this);
+//        btnSelectInterest=(Button)findViewById(R.id.selectInterest);
+//        btnSelectInterest.setOnClickListener(this);
         btnSignIn = (Button) findViewById(R.id.sign_in_button);
         btnSignIn.setOnClickListener(this);
         btnSignUp = (Button) findViewById(R.id.sign_up_button);
@@ -185,84 +185,84 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
             case R.id.btn_reset_password:
                 startActivity(new Intent(SignupActivity.this, ResetPasswordActivity.class));
                 break;
-            case R.id.selectInterest:getInterests();
-                break;
-            case R.id.btn_select_art:
-                Intent pickPhoto = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(pickPhoto, PICK_ARTIST_IMAGE);
-                break;
+//            case R.id.selectInterest:getInterests();
+//                break;
+//            case R.id.btn_select_art:
+//                Intent pickPhoto = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+//                startActivityForResult(pickPhoto, PICK_ARTIST_IMAGE);
+//                break;
         }
     }
 
-    public void getInterests()    {
+//    public void getInterests()    {
+//
+//        final StringBuilder interests=new StringBuilder();
+//        final CharSequence[] dialogList = {"Abstract", "Cotemporary","Photorealism"};
+//
+//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//        final ArrayList<Integer> selectedItems = new ArrayList<Integer>();
+//        // set the dialog title
+//        boolean[] itemChecked = new boolean[selectedItems.size()];
+//
+//        builder.setMultiChoiceItems(dialogList,null, new DialogInterface.OnMultiChoiceClickListener() {
+//
+//            @Override
+//            public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+//
+//                if (isChecked) {
+//                    // if the user checked the item, add it to the selected items
+//                    selectedItems.add(which);
+//                }
+//
+//                else if (selectedItems.contains(which)) {
+//                    // else if the item is already in the array, remove it
+//                    selectedItems.remove(Integer.valueOf(which));
+//                }
+//
+//            }
+//
+//        })
+//                // Set the action buttons
+//                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int id) {
+//                        String selectedIndex = "";
+//                        for(Integer i : selectedItems){
+//                            selectedIndex += i + ", ";
+//                            interests.append(dialogList[i]+"; ");
+//                            tvInterests.setText(interests.toString());
+//                        }
+//                    }
+//                })
+//
+//                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int id) {
+//                        // removes the AlertDialog in the screen
+//                    }
+//                })
+//                .show();
+//    }
 
-        final StringBuilder interests=new StringBuilder();
-        final CharSequence[] dialogList = {"Abstract", "Cotemporary","Photorealism"};
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        final ArrayList<Integer> selectedItems = new ArrayList<Integer>();
-        // set the dialog title
-        boolean[] itemChecked = new boolean[selectedItems.size()];
+//    @Override
+//    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+//        user.userType = (parent.getItemAtPosition(position).toString());
+//
+//        if(user.userType.equals("Patreon"))   {
+//            //show elements of patreon
+//            artistExt.setVisibility(View.GONE);
+//        }
+//        else if(user.userType.equals("Artist"))  {
+//            // show elements of artist
+//            artistExt.setVisibility(View.VISIBLE);
+//        }
+//    }
 
-        builder.setMultiChoiceItems(dialogList,null, new DialogInterface.OnMultiChoiceClickListener() {
-
-            @Override
-            public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-
-                if (isChecked) {
-                    // if the user checked the item, add it to the selected items
-                    selectedItems.add(which);
-                }
-
-                else if (selectedItems.contains(which)) {
-                    // else if the item is already in the array, remove it
-                    selectedItems.remove(Integer.valueOf(which));
-                }
-
-            }
-
-        })
-                // Set the action buttons
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        String selectedIndex = "";
-                        for(Integer i : selectedItems){
-                            selectedIndex += i + ", ";
-                            interests.append(dialogList[i]+"; ");
-                            tvInterests.setText(interests.toString());
-                        }
-                    }
-                })
-
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        // removes the AlertDialog in the screen
-                    }
-                })
-                .show();
-    }
-
-
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        user.userType = (parent.getItemAtPosition(position).toString());
-
-        if(user.userType.equals("Patreon"))   {
-            //show elements of patreon
-            artistExt.setVisibility(View.GONE);
-        }
-        else if(user.userType.equals("Artist"))  {
-            // show elements of artist
-            artistExt.setVisibility(View.VISIBLE);
-        }
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> parent) {
-
-    }
+//    @Override
+//    public void onNothingSelected(AdapterView<?> parent) {
+//
+//    }
 
     public void loadImageFromStorage()  {
 
@@ -340,22 +340,22 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
                     }
                 }
                 break;
-            case PICK_ARTIST_IMAGE:
-                if(resultCode == RESULT_OK){
-                    try {
-                        final Uri imageUri = imageReturnedIntent.getData();
-                        final InputStream imageStream = getContentResolver().openInputStream(imageUri);
-                        final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
-                        artBitmap=selectedImage;
-                        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-                        selectedImage.compress(Bitmap.CompressFormat.JPEG,50,bytes);
-                        //keep the image ready here to upload to db
-                        tvArtistArt.setText(imageUri.toString());
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-                break;
+//            case PICK_ARTIST_IMAGE:
+//                if(resultCode == RESULT_OK){
+//                    try {
+//                        final Uri imageUri = imageReturnedIntent.getData();
+//                        final InputStream imageStream = getContentResolver().openInputStream(imageUri);
+//                        final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
+//                        artBitmap=selectedImage;
+//                        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+//                        selectedImage.compress(Bitmap.CompressFormat.JPEG,50,bytes);
+//                        //keep the image ready here to upload to db
+//                        //tvArtistArt.setText(imageUri.toString());
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//                break;
         }
     }
 
@@ -428,18 +428,18 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
         String address = edtAddress.getText().toString();
         String userType = profileSpinner.getSelectedItem().toString();
         String userBio = edtBio.getText().toString();
-        String userInterests = tvInterests.getText().toString();
-        createUser(name,email,phone,address,userType,userBio,userInterests);
+        //String userInterests = tvInterests.getText().toString();
+        createUser(name,email,phone,address,userType,userBio);
 
         //direct user to home screen
         startActivity(new Intent(SignupActivity.this, HomeActivity.class));
         finish();
     }
 
-    private void createUser(String name, String email, String phone, String address, String usertype, String userBio, String userInterests) {
+    private void createUser(String name, String email, String phone, String address, String usertype, String userBio/*, String userInterests*/) {
         uid = auth.getCurrentUser().getUid();
 
-        User user = new User(name, email, phone, address, usertype, userBio, userInterests);
+        User user = new User(name, email, phone, address, usertype, userBio/*, userInterests*/);
         mFirebaseDatabase.child(uid).setValue(user);
 
         if (profileBitmap != null) {
