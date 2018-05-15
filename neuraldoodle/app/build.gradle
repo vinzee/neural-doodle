@@ -41,6 +41,7 @@ dependencies {
     implementation 'com.nineoldandroids:library:2.4.0'
     implementation 'com.daimajia.slider:library:1.1.5@aar'
     implementation 'com.android.support:recyclerview-v7:27.1.1'
+    implementation 'gun0912.ted:tedbottompicker:1.1.0'
 }
 
 apply plugin: 'com.google.gms.google-services'

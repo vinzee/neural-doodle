@@ -1,13 +1,26 @@
 package com.example.vinzee.neural_doodle;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.DrawableRes;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Layout;
+import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.EditText;
+import android.widget.Gallery;
+import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
@@ -15,25 +28,28 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import org.w3c.dom.Text;
+
+import gun0912.tedbottompicker.TedBottomPicker;
+
 public class NewProjectActivity extends AppCompatActivity implements View.OnClickListener {
 
     private FirebaseAuth auth;
     private StorageReference mStorageRef;
-        private DatabaseReference mFirebaseDatabase;
+    private DatabaseReference mFirebaseDatabase;
     private FirebaseDatabase mFirebaseInstance;
     private EditText projectNameText;
     private FloatingActionButton beginButton;
-    private RadioGroup styleRadioGroup;
-    private RadioButton renoir;
-    private RadioButton monet;
-    private RadioButton gogh;
-    private RadioButton picasso;
-    private RadioButton artist1;
-    private RadioButton artist2;
-    private RadioButton artist3;
-    private RadioButton artist4;
-    private RadioButton artist5;
-    private RadioButton artist6;
+
+    private static final @DrawableRes int[] ARTIST_IMAGES = {
+            R.drawable.renoir, R.drawable.monet, R.drawable.gogh, R.drawable.picasso, R.drawable.artist1, R.drawable.artist2, R.drawable.artist3, R.drawable.artist4, R.drawable.artist5, R.drawable.artist6
+    };
+
+    private static final String[] ARTIST_LABELS = {
+            "Renoir", "Monet", "Gogh", "Picasso", "Artist1", "Artist2", "Artist3", "Artist4", "Artist5", "Artist6"
+    };
+
+    private GridView mGridView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,29 +62,47 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
         projectNameText = findViewById(R.id.project_name);
         beginButton = findViewById(R.id.create_project_button);
         beginButton.setOnClickListener(this);
-        styleRadioGroup = findViewById(R.id.styleRadioGroup);
-        renoir = findViewById(R.id.renoir);
-        monet = findViewById(R.id.monet);
-        gogh = findViewById(R.id.gogh);
-        picasso = findViewById(R.id.picasso);
-        artist1 = findViewById(R.id.artist1);
-        artist2 = findViewById(R.id.artist2);
-        artist3 = findViewById(R.id.artist3);
-        artist4 = findViewById(R.id.artist4);
-        artist5 = findViewById(R.id.artist5);
-        artist6 = findViewById(R.id.artist6);
-
 
         auth = FirebaseAuth.getInstance();
         mStorageRef = FirebaseStorage.getInstance().getReference();
         mFirebaseInstance = FirebaseDatabase.getInstance();
         mFirebaseDatabase = mFirebaseInstance.getReference("projects");
 
+        mGridView = findViewById(R.id.gridview);
+        mGridView.setChoiceMode(GridView.CHOICE_MODE_SINGLE);
+        mGridView.setAdapter(new BaseAdapter() {
+            @Override public int getCount() {
+                return ARTIST_IMAGES.length;
+            }
+            @Override public Object getItem(int position) {
+                return ARTIST_IMAGES[position];
+            }
+            @Override public long getItemId(int position) {
+                return ARTIST_IMAGES[position];
+            }
+            @Override public View getView(final int position, View convertView, ViewGroup parent) {
+                if (convertView == null || !(convertView instanceof ImageView)) {
+                    RelativeLayout relativeLayout = (RelativeLayout) getLayoutInflater().inflate(R.layout.grid_item_view, parent, false);
+                    ImageView imageView = relativeLayout.findViewById(R.id.grid_image_view);
+                    imageView.setImageResource(ARTIST_IMAGES[position]);
+                    convertView = imageView;
+
+                    TextView textView = relativeLayout.findViewById(R.id.grid_text_view);
+                    textView.setText(ARTIST_LABELS[position]);
+                }
+                return convertView;
+            }
+        });
     }
 
     @Override
     public void onClick(View v) {
         String projectName = projectNameText.getText().toString();
+
+        if (mGridView.getCheckedItemPosition() == -1) {
+            Toast.makeText(getApplicationContext(), "Please Select Artist", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         if (projectName == null || projectName.equals("") ) {
             projectNameText.setError( "Project name is required!" );
@@ -79,7 +113,7 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
 
         String userId = auth.getCurrentUser().getUid();
         String projectKey = mFirebaseDatabase.child(userId).push().getKey();
-        String style = ((RadioButton)findViewById(styleRadioGroup.getCheckedRadioButtonId())).getText().toString();
+        String style = ARTIST_LABELS[mGridView.getCheckedItemPosition()];
 
         mFirebaseDatabase.child(userId).child(projectKey).child("name").setValue(projectName);
         mFirebaseDatabase.child(userId).child(projectKey).child("style").setValue(style);
@@ -90,7 +124,9 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
         intent.putExtra("name", projectName);
         intent.putExtra("userId", userId);
         intent.putExtra("style", style);
+
         startActivity(intent);
+
         finish();
     }
 }
