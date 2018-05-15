@@ -2,6 +2,7 @@ package com.example.vinzee.neural_doodle;
 
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -26,6 +27,8 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
+import static android.content.Context.MODE_PRIVATE;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -37,6 +40,8 @@ public class ChatFragment extends Fragment {
     ListView usersList;
     TextView noUsersText;
     ArrayList<User> ul = new ArrayList<>();
+    private SharedPreferences prf;
+    User usr = new User();
 
 
     Button btn;
@@ -77,6 +82,11 @@ public class ChatFragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_chat, container, false);
         mFirebaseInstance = FirebaseDatabase.getInstance();
 
+        prf = this.getActivity().getSharedPreferences("user_details",MODE_PRIVATE);
+        usr.uID = prf.getString("uID",null);
+        usr.name = prf.getString("name",null);
+
+
         // get reference to 'users' node
         mFirebaseDatabase = mFirebaseInstance.getReference("users");
         mFirebaseDatabase.addValueEventListener(new ValueEventListener() {
@@ -85,12 +95,11 @@ public class ChatFragment extends Fragment {
                 Log.e(TAG, "App title updated");
                 for (DataSnapshot uniqueUserSnapshot : dataSnapshot.getChildren()) {
                     User currentUser = uniqueUserSnapshot.getValue(User.class);
-                    ul.add(currentUser);
 
-                    if (currentUser.name != null) {
+                    if(usr.name != null && !currentUser.name.equals(usr.name)) {
+                        ul.add(currentUser);
+
                         userName.add(currentUser.name);
-                    } else {
-                        userName.add("Untitled");
                     }
                 }
                 updateUserList();
