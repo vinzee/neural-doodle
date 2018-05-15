@@ -40,6 +40,8 @@ import com.android.volley.toolbox.Volley;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -60,18 +62,18 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
     //custom drawing view
     private DrawingView drawView;
     //buttons
-    private ImageButton currPaint, drawBtn, eraseBtn, newBtn, saveBtn, magicBtn; // , opacityBtn
+    private ImageButton currPaint, drawBtn, eraseBtn, newBtn, saveBtn, magicBtn, editBtn, deleteBtn; // , opacityBtn
     //sizes
-    private float smallBrush, mediumBrush, largeBrush;
+    private float mediumBrush, largeBrush; // smallBrush,
 
     private RequestQueue queue;
     private final String BASE_URL = "http://43a87bf7.ngrok.io";
     private static final int MAX_IMAGE_SIZE = 600;
     private FirebaseAuth auth;
     private StorageReference mStorageRef;
-    private String projectName;
-    private String projectId;
-    private String style;
+    private DatabaseReference mFirebaseDatabase;
+    private FirebaseDatabase mFirebaseInstance;
+    private String projectName, projectId, style;
     private String projectPath;
 
     @Override
@@ -111,7 +113,7 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
         currPaint.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.paint_pressed, null));
 
         //sizes from dimensions
-        smallBrush = getResources().getInteger(R.integer.small_size);
+//        smallBrush = getResources().getInteger(R.integer.small_size);
         mediumBrush = getResources().getInteger(R.integer.medium_size);
         largeBrush = getResources().getInteger(R.integer.large_size);
 
@@ -146,8 +148,16 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
 //        opacityBtn.setOnClickListener(this);
 
         //opacity
+
         magicBtn = findViewById(R.id.magic_btn);
         magicBtn.setOnClickListener(this);
+
+        deleteBtn = findViewById(R.id.delete_btn);
+        deleteBtn.setOnClickListener(this);
+
+        editBtn = findViewById(R.id.edit_btn);
+        editBtn.setOnClickListener(this);
+
         auth = FirebaseAuth.getInstance();
 
         projectPath = "images/" + projectId + "_project.png";
@@ -168,6 +178,7 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
             }
         });
 
+        mFirebaseInstance = FirebaseDatabase.getInstance();
 
         // Here, thisActivity is the current activity
         if (ContextCompat.checkSelfPermission(this,
@@ -264,6 +275,49 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
         ImageButton mediumBtn, largeBtn; // smallBtn
 
         switch(view.getId()) {
+            case R.id.edit_btn:
+                Intent intent = new Intent(CanvasActivity.this, NewProjectActivity.class);
+                intent.putExtra("projectId", projectId);
+                intent.putExtra("name", projectName);
+                intent.putExtra("style", style);
+
+                startActivity(intent);
+                finish();
+
+                break;
+
+            case R.id.delete_btn:
+
+                AlertDialog.Builder newDialog = new AlertDialog.Builder(this);
+                newDialog.setTitle("Delete Project");
+                newDialog.setMessage("Are you sure you want to delete this project ?");
+
+                newDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        mFirebaseDatabase = mFirebaseInstance.getReference("projects");
+                        String userId = auth.getCurrentUser().getUid();
+                        DatabaseReference userDatabaseReference = mFirebaseDatabase.child(userId);
+                        userDatabaseReference.child(projectId).removeValue();
+
+                        dialog.dismiss();
+
+                        Toast.makeText(getApplicationContext(), "Project deleted!", Toast.LENGTH_SHORT).show();
+
+                        Intent intent = new Intent(CanvasActivity.this, HomeActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                });
+
+                newDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                newDialog.show();
+
+                break;
             case R.id.draw_btn:
                 //draw button clicked
                 brushDialog = new Dialog(this);
@@ -353,22 +407,22 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
                 break;
 
             case R.id.new_btn:
-                //new button
-                AlertDialog.Builder newDialog = new AlertDialog.Builder(this);
-                newDialog.setTitle("New drawing");
-                newDialog.setMessage("Start new drawing (you will lose the current drawing)?");
-                newDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                AlertDialog.Builder newDialog1 = new AlertDialog.Builder(this);
+                newDialog1.setTitle("New drawing");
+                newDialog1.setMessage("Start new drawing (you will lose the current drawing)?");
+                newDialog1.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         drawView.startNew();
                         dialog.dismiss();
                     }
                 });
-                newDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                newDialog1.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.cancel();
                     }
                 });
-                newDialog.show();
+                newDialog1.show();
+
                 break;
 
 //            case R.id.opacity_btn:

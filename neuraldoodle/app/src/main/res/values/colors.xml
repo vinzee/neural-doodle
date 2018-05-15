@@ -27,4 +27,9 @@
     <color name="gray">#787777</color>
     <color name="paint_pressed">#969696</color>
 
+    <color name="image_selected">#6003a9f4</color>
+
+    <color name="transparent">#00000000</color>
+
+
 </resources>

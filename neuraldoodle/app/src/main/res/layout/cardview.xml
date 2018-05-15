@@ -9,7 +9,7 @@
 
     <com.daimajia.slider.library.SliderLayout
         android:id="@+id/project_slider"
-        card_view:indicator_visibility="invisible"
+        card_view:indicator_visibility="visible"
         android:layout_width="match_parent"
         android:layout_height="400dp" />
 
