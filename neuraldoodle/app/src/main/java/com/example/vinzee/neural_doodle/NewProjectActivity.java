@@ -83,7 +83,7 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
             }
             @Override public View getView(final int position, View convertView, ViewGroup parent) {
                 if (convertView == null || !(convertView instanceof ImageView)) {
-                    RelativeLayout relativeLayout = (RelativeLayout) getLayoutInflater().inflate(R.layout.grid_item_view, parent, false);
+                    CheckedRelativeLayout relativeLayout = (CheckedRelativeLayout) getLayoutInflater().inflate(R.layout.grid_item_view, parent, false);
 
                     final ImageView imageView = relativeLayout.findViewById(R.id.grid_image_view);
                     imageView.setImageResource(ARTIST_IMAGES[position]);
@@ -92,17 +92,19 @@ public class NewProjectActivity extends AppCompatActivity implements View.OnClic
                     textView.setText(ARTIST_LABELS[position]);
 
                     convertView = relativeLayout;
-                    relativeLayout.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Toast.makeText(getApplicationContext(), "Selected artist - " + ARTIST_LABELS[position], Toast.LENGTH_SHORT).show();
-                        }
-                    });
+//                    relativeLayout.setOnClickListener(new View.OnClickListener() {
+//                        @Override
+//                        public void onClick(View v) {
+//                            Toast.makeText(getApplicationContext(), "Selected artist - " + ARTIST_LABELS[position], Toast.LENGTH_SHORT).show();
+//                        }
+//                    });
                 }
 
                 return convertView;
             }
         });
+
+        mGridView.setItemChecked(0, true);
     }
 
     @Override
