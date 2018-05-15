@@ -70,8 +70,7 @@ public class HomeActivity extends AppCompatActivity {
                     pushFragment(new ProjectsFragment());
                     return true;
                 case R.id.navigation_messages:
-                    Intent i = new Intent(HomeActivity.this,ListUser.class);
-                    startActivity(i);
+                    pushFragment(new ChatFragment());
                     return true;
                 case R.id.navigation_profile:
                     pushFragment(new ProfileFragment());
