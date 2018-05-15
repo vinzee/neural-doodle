@@ -1,5 +1,6 @@
 package com.example.vinzee.neural_doodle;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -61,7 +62,8 @@ public class HomeActivity extends AppCompatActivity {
                     pushFragment(new ProjectsFragment());
                     return true;
                 case R.id.navigation_messages:
-                    pushFragment(new ChatFragment());
+                    Intent i = new Intent(HomeActivity.this,ListUser.class);
+                    startActivity(i);
                     return true;
                 case R.id.navigation_profile:
                     pushFragment(new ProfileFragment());

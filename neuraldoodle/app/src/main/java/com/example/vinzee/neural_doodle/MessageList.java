@@ -10,6 +10,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
@@ -31,6 +33,8 @@ public class MessageList extends AppCompatActivity {
     private DatabaseReference mFirebaseDatabaseUsr, mFirebaseDatabaseCht;
     private FirebaseDatabase mFirebaseInstance;
     private FirebaseAuth auth;
+    Button mMessageSendButton;
+    private EditText mMessageEditText;
 
     String chatwith;
     @Override
@@ -38,6 +42,9 @@ public class MessageList extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_message_list);
 
+        mMessageEditText = (EditText) findViewById(R.id.edittext_chatbox);
+
+        mMessageSendButton = (Button) findViewById(R.id.button_chatbox_send);
 
         prf = getSharedPreferences("user_details",MODE_PRIVATE);
         usr.uID = prf.getString("uID",null);
@@ -60,29 +67,29 @@ public class MessageList extends AppCompatActivity {
         mMessageRecycler.setLayoutManager(new LinearLayoutManager(this));
         mMessageRecycler.setAdapter(mMessageAdapter);
 
-//        sendButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                String messageText = messageArea.getText().toString();
+        mMessageSendButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String messageText = mMessageEditText.getText().toString();
+
+                if(!messageText.equals("")){
+
+                    Message friendlyMessage = new Message(messageText, usr.name,
+                            usr.uID + "_profile.jpg", null,Helper.GetDateTime());
+                    mFirebaseDatabaseUsr.push().setValue(friendlyMessage);
+                    mFirebaseDatabaseCht.push().setValue(friendlyMessage);
+
+//                    mFirebaseAnalytics.logEvent(MESSAGE_SENT_EVENT, null);
 //
-//                if(!messageText.equals("")){
-//
-//                    Message friendlyMessage = new Message(messageText, usr.name,
-//                            usr.uID + "_profile.jpg", null,Helper.GetDateTime());
-//                    mFirebaseDatabaseUsr.push().setValue(friendlyMessage);
-//                    mFirebaseDatabaseCht.push().setValue(friendlyMessage);
-//
-////                    mFirebaseAnalytics.logEvent(MESSAGE_SENT_EVENT, null);
-////
-////                    Map<String, String> map = new HashMap<String, String>();
-////                    map.put("message", messageText);
-////                    map.put("user", usr.name);
-////                    mFirebaseDatabaseUsr.push().setValue(map);
-////                    mFirebaseDatabaseCht.push().setValue(map);
-//                    messageArea.setText("");
-//                }
-//            }
-//        });
+//                    Map<String, String> map = new HashMap<String, String>();
+//                    map.put("message", messageText);
+//                    map.put("user", usr.name);
+//                    mFirebaseDatabaseUsr.push().setValue(map);
+//                    mFirebaseDatabaseCht.push().setValue(map);
+                    mMessageEditText.setText("");
+                }
+            }
+        });
 
 
         mFirebaseDatabaseUsr.addChildEventListener(new ChildEventListener() {

@@ -10,6 +10,7 @@ public class User implements Serializable {
     public String address;
     public String userType;
     public String userBio;
+    String icon;
     //public String interests;
 
     public User(){
