@@ -67,7 +67,7 @@ public class CanvasActivity extends AppCompatActivity implements View.OnClickLis
     private float mediumBrush, largeBrush; // smallBrush,
 
     private RequestQueue queue;
-    private final String BASE_URL = "http://43a87bf7.ngrok.io";
+    private final String BASE_URL = "http://427e9b64.ngrok.io";
     private static final int MAX_IMAGE_SIZE = 600;
     private FirebaseAuth auth;
     private StorageReference mStorageRef;
